@@ -1,12 +1,8 @@
-# The Forge
+# Rigger
 
-Forge is a framework for dependency injection, inversion of control and container-managed instances. It is a part of TheCommons project. It is being developed to address some feature gaps in common C# DI frameworks. Some may notice that it is very Spring Boot-esq and that is intentional. It is the hope that this platform can be used to quickly build projects with advanced features. 
+Rigger is a framework for dependency injection, inversion of control and container-managed instances. It is a part of a greater project I'm working on. It is being developed to address some feature gaps in common C# DI frameworks. Some may notice that it is very Spring Boot-esq and that is intentional. It is the hope that this platform can be used to quickly build projects with advanced features. 
 
-Forge is also designed to work well with other TheCommons libraries such as Cache, Logger and Mapper in order to provide those systems
-automatically to any application developed with Forge. This will allow any Forge Application to receive enhancements as those
-projects are being worked on.
-
-Forge is designed to be fast (not as fast as "new", but not as slow as Activtor), lightweight (simple interfaces), extensible (Plugins / Modules) and easy to use (configuration-lite). 
+Rigger is designed to be fast (not as fast as "new", but not as slow as Activtor), lightweight (simple interfaces), extensible (Plugins / Modules) and easy to use (configuration-lite). 
 
 ### Features
 + Attribute based registration and autowiring.
@@ -17,21 +13,17 @@ Forge is designed to be fast (not as fast as "new", but not as slow as Activtor)
 + Instance lifecycle hooks (OnCreate, OnStartup, OnBuilt, OnDestroy)
 + Application Event Pipeline
 + Cached expression-based Member Invokers and Constructor Activators for speedy autowiring.
-+ Module / Plugin System for Extensibility (Ingots)
++ Module / Plugin System for Extensibility (Drones)
 + Fail Fast application startup.
 + Managed startup lifecycle and dependency ordering (Module -> Configuration -> Managed -> Singleton -> Bootstrap).
-+ Include Additional Forge libraries for added functionality :
-  - Forge.Cloud, unified cloud services automatically configured and injected into the container
-  - Forge.API, automatically bootstraps a GraphQL endpoint that integrates your entity model
-  - Forge.Data, Wide Column Storage, ML Services, And Statistical Services
-  - Forge.Chronos, Timer functionality for services.
++ Include Additional Drone libraries for added functionality :
+  - Rigged.Cloud, unified cloud services automatically configured and injected into the container
+  - Rigged.API, automatically bootstraps a GraphQL endpoint that integrates your entity model
+  - Rigged.Data, Wide Column Storage, ML Services, And Statistical Services
+  - Rigged.Chronos, Timer functionality for services.
 
 ### TODO 
-- Simplified Registration
-- Improved Container Validation
 - Better Lifecycle Management
-- Refactor InstanceRegistry / TypeRegistry / ConcreteTypes to be more simple
-- Open generic type registration (also Refactor generic type handling in most code)
 
 ## Quickstart
 
@@ -39,122 +31,7 @@ In order to create a application, it is as simple as inheriting from the Applica
 the configuration of the application. This will start the component scanning part of the framework and it will discover all components
 that are marked with a Managed Type attribute. You can pass in additional assemblies to the ApplicationContainer constructor in order to 
 include other Assemblies in your application. This will allow a plugin type style of development.
-
-```
-class YourApplication : ApplicationContainer
-    {
-        static void Main(string[] ar
-        {
-            YourApplication ex = new YourApplication();
-        }
-    }
-```
-
-Alternatively, if you are implementing a .Net Core application you can register forge as your service provider like so:
-
-```
-public class Startup { 
-  public IServiceProvider ConfigureServices(IServiceCollection services) {
-     var provider = new ForgeServiceProvider();
-    
-     provider.RegisterAll(services);
-  
-     return provider;
-  }
-}
-```
-
-## Managed Type Attributes
-
-There are five types of attributes that will mark a class as a *Managed Type* and they are instantiated and registered at different times 
-at the application lifecycle. The five types are Module, Configuration, Singleton, Managed, Bootstrap and each are treated a bit differently
-by the container. The following section will explain all of these Managed Type Attributes and give an example on how they work.
-
-### Modules
-
-Modules are classes that modify the basic functionality of the framework. They are simply classes with a constructor that take the ApplicationContext as an argument. In this constructor
-the implementor can change the basic building blocks of the framework. The default module that gets loaded is below.
-
-Modules are instantiated before any registration or scanning is done.
-
-```
-[Module]
-public class DefaultModule
-{
-    public DefaultModule(ApplicationContext ctx)
-    {
-        ctx.EventRegistry = new EventRegistry();
-        ctx.ConfigurationService = new DefaultConfigurationService().AddSource(new MapConfigurationSource());
-        ctx.InstanceRegistry = new InstanceRegistry();
-        ctx.TypeRegistry = new ManagedTypeRegistry();
-        ctx.InstanceFactory = new DefaultInstanceFactory();
-        ctx.Logger = new ConsoleLogger().Logger;
-        ctx.ComponentScanners = new IComponentScanner<IEnumerable<Type>>[]
-        {
-            new RootConfigurationComponentScanner(),
-            new ManagedComponentScanner(),
-            new SingletonComponentScanner(),
-            new BootstrapComponentScanner()
-        };
-
-        ctx.Autowire(ctx.ConfigurationService, ctx.InstanceRegistry, ctx.TypeRegistry, ctx.InstanceFactory, ctx.Logger, ctx.EventRegistry);
-        ctx.Autowire(ctx.ComponentScanners);
-    }
-
-}
-```
-
-### Configuration
-
-Configurations are loaded after Modules in order of priority (highest first). The constructor
-can be injected with components that have been registered and values that
-are loaded from the container configuration service. 
-
-There are some caveats to configurations.
-
-- Configurations cannot use field or property autowiring. 
-- Configurations are instantiated before Managed / Singleton services, so you cannot inject those into the constructor. This assures that 
-Managed, Singleton and Bootstrap serviecs will benefit from all configuration values. 
-- IContainer, IValueInjector, EventRegistry, IConfigurationService, TypeRegistry, InstanceRegistry, IInstanceFactory, and ILogger
-can be injected into configurations.
-  
-Here's an example of a configuration creating a database.
-
-```
-[Configuration(Priority = 100)]
-public class DatabaseConfiguration
-{
-
-    [Autowire]
-    public DatabaseConfiguration(IContainer container, 
-        ILogger logger,
-        IConfigurationService configService,
-        [Value(Key = "ConnectionStrings:Db")] string connectionString)
-    {
-        var optionsBuilder = new DbContextOptionsBuilder<ConfigurationEntityContext>();
-        if (connectionString != null)
-        {
-            optionsBuilder.UseSqlServer(connectionString);
-        }
-        else
-        {
-            logger.LogInformation("Using in-memory database");
-            optionsBuilder.UseInMemoryDatabase("Exemplar-Db");
-        }
-
-        var context = new ConfigurationEntityContext(optionsBuilder.Options);
-
-        context.Database.EnsureCreated();
-
-        container.Register(typeof(ConfigurationEntityContext), context);
-
-        configService.AddSource(new DatabaseConfigurationSource(context));
-
-    }
-}                                   
-```
-
-
+                        
 ### Singleton
 
 Singletons are scanned after configurations. They are not instantiated
@@ -172,19 +49,7 @@ public class PropertyService
     /// <param name="value"></param>
     public void Set(string key, string value)
     {
-        var configurationValue = context.ConfigurationEntity.FirstOrDefault(o => o.Name == key) ??
-                                    new ConfigurationEntity
-                                    {
-                                        Name = key
-                                    };
-        
-        configurationValue.Value = value;
-        
-        var ud = context.Entry(configurationValue).State == EntityState.Detached 
-            ? context.Add(configurationValue) 
-            : context.Update(configurationValue);
-
-        context.SaveChanges();
+        ... Code ...
     }
 }
 ```
