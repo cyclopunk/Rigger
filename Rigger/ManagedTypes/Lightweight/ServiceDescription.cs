@@ -9,6 +9,7 @@ namespace Rigger.ManagedTypes.Lightweight
         public Type ServiceType { get; set; }
 
         public Type ImplementationType { get; set; }
+        public Func<Services, Type, object> Factory { get; set; }
         
         public ServiceLifecycle LifeCycle { get; set; }
 

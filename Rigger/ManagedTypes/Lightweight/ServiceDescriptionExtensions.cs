@@ -48,7 +48,7 @@ namespace Rigger.ManagedTypes.Lightweight
             if (description.IsOpenService())
             { 
                 
-                return description.ImplementationType.GetInterfaces().Any(it =>
+                return description.Factory != null ||  description.ImplementationType.GetInterfaces().Any(it =>
                     it.IsConstructedGenericType && it.GetGenericTypeDefinition() == description.ServiceType);
             }
 

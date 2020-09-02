@@ -94,6 +94,18 @@ namespace Rigger.ManagedTypes.Lightweight
 
             return this;
         }
+        public Services Add(Type lookupType, Func<Services, Type, object> factory)
+        {
+            _descriptionMap.Add(lookupType, new ServiceDescription
+            {
+                ServiceType = lookupType,
+                ImplementationType = typeof(Func<Type, object>),
+                Factory = factory,
+                LifeCycle = ServiceLifecycle.Singleton
+            });
+
+            return this;
+        }
         /// <summary>
         /// Add a singleton instance.
         /// </summary>
@@ -225,6 +237,15 @@ namespace Rigger.ManagedTypes.Lightweight
 
                     if (openType != null)
                     {
+                        if (openType.Factory != null)
+                        {
+                            var instance = openType.Factory(this, serviceType.GetGenericArguments().First());
+                            
+                            Add(serviceType, instance);
+
+                            return instance;
+                        }
+
                         var makeType = openType.ImplementationType.MakeGenericType(serviceType.GetGenericArguments());
 
                         // cache constructed type
@@ -239,8 +260,13 @@ namespace Rigger.ManagedTypes.Lightweight
 
                 _descriptionMap.TryGetValue(serviceType, out var desc);
 
+
+
                 if (desc != null)
                 {
+                    if (desc.Factory != null)
+                        return desc.Factory(this, serviceType.GetGenericArguments().First());
+
                     IServiceInstance instance = GetServiceInstance(desc);
 
                     _instanceMap.Add(serviceType, instance);
