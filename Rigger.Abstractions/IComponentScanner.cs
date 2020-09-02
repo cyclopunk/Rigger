@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using Rigger.ManagedTypes.Lightweight;
+using Rigger.Injection;
 
 namespace Rigger.ManagedTypes.ComponentScanners
 {

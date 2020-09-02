@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Rigger.ManagedTypes.Lightweight.Defaults
+namespace Rigger.Injection.Defaults
 {
     public class DefaultServiceInstance : IServiceInstance, IServiceAware
     {
@@ -10,7 +10,7 @@ namespace Rigger.ManagedTypes.Lightweight.Defaults
             InstanceType = null;
         }
 
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
         public Type InstanceType { get; set; }
     }
 }

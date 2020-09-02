@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Logging;
 using Rigger;
 using Rigger.Attributes;
+using Rigger.Injection;
 using Rigger.ManagedTypes;
-using Rigger.ManagedTypes.Lightweight;
 
 namespace Drone.Bootstrap
 {

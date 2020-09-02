@@ -3,8 +3,8 @@ using System.Linq;
 using System.Reflection;
 using Rigger.Extensions;
 using Rigger.ManagedTypes.ComponentScanners;
-using Rigger.ManagedTypes.Lightweight;
 using Rigger.Attributes;
+using Rigger.Injection;
 
 namespace Rigger.ManagedTypes.ComponentHandlers
 {
@@ -17,7 +17,7 @@ namespace Rigger.ManagedTypes.ComponentHandlers
     /// </summary>
     public class IngotComponentHandler : IComponentHandler<IngotAttribute>
     {
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
         [Autowire]
         private IComponentHandler<BootstrapAttribute> BootstrapComponentHandler { get; set; }
         [Autowire]

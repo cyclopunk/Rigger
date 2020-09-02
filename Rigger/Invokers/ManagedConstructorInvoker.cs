@@ -7,14 +7,14 @@ using Microsoft.Extensions.Logging;
 using Rigger.Configuration;
 using Rigger.Extensions;
 using Rigger.Reflection;
-using Rigger.ManagedTypes.Lightweight;
 using Rigger.ManagedTypes.ServiceLocator;
 using Rigger.Attributes;
+using Rigger.Injection;
 
 namespace Rigger.ManagedTypes.Implementations
 {
 
-    public class ScopedConstructorInvoker : IConstructorInvoker
+    public class ScopedConstructorInvoker : IConstructorActivator
     {
         private Guid scopeId;
 
@@ -40,7 +40,7 @@ namespace Rigger.ManagedTypes.Implementations
     /// A constructor invoker that takes in a container to use for service
     /// lookup. Meant to be cached.
     /// </summary>
-    public class ManagedConstructorInvoker : IConstructorInvoker, IServiceAware
+    public class ManagedConstructorInvoker : IConstructorActivator, IServiceAware
     {
         
         private static IDictionary<Type, ConstructorInfo> ctorCache =
@@ -48,7 +48,7 @@ namespace Rigger.ManagedTypes.Implementations
         private readonly IContainer _container;
         private readonly Type _typeToConstruct;
 
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
 
         public ManagedConstructorInvoker()
         {
@@ -179,9 +179,9 @@ namespace Rigger.ManagedTypes.Implementations
                 {
                     if (o.ParameterType.IsGenericType && o.ParameterType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                     {
-                        return Services.Get(o.ParameterType.GetGenericArguments().First()) != null;
+                        return Services.GetService(o.ParameterType.GetGenericArguments().First()) != null;
                     }
-                    return Services.Get(o.ParameterType) != null;
+                    return Services.GetService(o.ParameterType) != null;
                 });
         }
     }

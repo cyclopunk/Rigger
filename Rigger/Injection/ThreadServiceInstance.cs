@@ -2,7 +2,7 @@
 using System.Threading;
 using Rigger.ManagedTypes.Implementations;
 
-namespace Rigger.ManagedTypes.Lightweight
+namespace Rigger.Injection
 {
     /// <summary>
     /// Service Instance that uses a ThreadLocal
@@ -11,7 +11,7 @@ namespace Rigger.ManagedTypes.Lightweight
     {
         private volatile ManagedConstructorInvoker _invoker; 
         private ThreadLocal<object> _threadLocalFactory;
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
         public Type InstanceType { get; set; }
 
         public object Instance => _threadLocalFactory.Value;

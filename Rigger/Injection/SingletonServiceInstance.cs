@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Rigger.ManagedTypes.Lightweight
+namespace Rigger.Injection
 {
     public class SingletonServiceInstance : IServiceInstance, IServiceAware
     {
@@ -36,7 +36,7 @@ namespace Rigger.ManagedTypes.Lightweight
             }
         }
 
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
 
         public object Get()
         {

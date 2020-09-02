@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace Rigger.ManagedTypes.Lightweight
+namespace Rigger.Injection
 {
     public interface IServiceInstance : IDisposable
     {
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
         public Type InstanceType { get; set; }
         public object Get()
         {

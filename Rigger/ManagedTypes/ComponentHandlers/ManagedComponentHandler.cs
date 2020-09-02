@@ -3,8 +3,8 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Rigger.Extensions;
 using Rigger.ManagedTypes;
-using Rigger.ManagedTypes.Lightweight;
 using Rigger.Attributes;
+using Rigger.Injection;
 
 namespace Rigger.ManagedTypes.ComponentHandlers
 {
@@ -13,7 +13,7 @@ namespace Rigger.ManagedTypes.ComponentHandlers
     /// </summary>
     public class ManagedComponentHandler : IComponentHandler<ManagedAttribute>
     {
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
 
         [Autowire] private ILogger _logger;
 
