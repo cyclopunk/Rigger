@@ -10,6 +10,7 @@ namespace Rigger.Injection
     /// </summary>
     public interface IServices : IServiceProvider, IDisposable, IAsyncDisposable
     {
+        IEnumerable<ValidationError> Validate();
 
         IServices Add(Type lookupType, Type concreteType,
             ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient);

@@ -9,5 +9,6 @@ namespace Rigger.Reflection
     public interface IConstructorActivator
     {
         object Construct(params object[] parameters);
+        object Construct(Type type, params object[] parameters);
     }
 }

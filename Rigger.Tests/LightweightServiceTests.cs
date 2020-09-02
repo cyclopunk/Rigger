@@ -14,6 +14,7 @@ using Rigger.Attributes;
 using Rigger.Extensions;
 using Rigger.Implementations;
 using Rigger.Injection;
+using Rigger.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -120,7 +121,7 @@ namespace Rigger.Tests {
             sd0.MoreSpecificService(sd1).Should().BeEquivalentTo(sd1);
         }
 
-       private Services InitServices()
+       private IServices InitServices()
        {
 
            /*var logFactory = new Func<Services, Type, object>((services, type) => {
@@ -134,7 +135,7 @@ namespace Rigger.Tests {
                 .Add<IAutowirer>(new ContainerAutowirer())
                 .Add<ILoggerFactory>(new TestLogger(output).LoggerFactory)
                 .Add(typeof(ILogger<>), typeof(Logger<>))
-                .Add<IConstructorInvoker>(new ManagedConstructorInvoker())
+                .Add<IConstructorActivator>(new ManagedConstructorInvoker())
                 .Add<IInstanceFactory>(new AutowireInstanceFactory())
                 .Add<IOption<SomeOption>, OptionOne>()
                 .Add<IOption<AnotherOption>, OptionTwo>()

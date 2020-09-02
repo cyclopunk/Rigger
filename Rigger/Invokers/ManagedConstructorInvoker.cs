@@ -82,13 +82,6 @@ namespace Rigger.ManagedTypes.Implementations
         /// <returns></returns>
         public object Construct(Type type, params object[] parameters)
         {
-            Guid scopeId = Guid.Empty;
-
-            if (parameters.FirstOrDefault() != null && parameters.First() is Guid scope)
-            {
-                scopeId = scope;
-                parameters = parameters.TakeLast(parameters.Length - 1).ToArray();
-            }
 
             ILogger log = Services.GetService<ILogger>();
 
