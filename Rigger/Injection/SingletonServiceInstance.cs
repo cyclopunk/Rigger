@@ -26,7 +26,7 @@ namespace Rigger.Injection
                 {
                     var instanceFactory = Services.GetService<IInstanceFactory>();
 
-                    _instanceInternal ??= instanceFactory.Make(InstanceType) ?? Activator.CreateInstance(InstanceType);
+                    _instanceInternal ??= instanceFactory?.Make(InstanceType) ?? Activator.CreateInstance(InstanceType, Services);
 
                     return _instanceInternal;
                 }

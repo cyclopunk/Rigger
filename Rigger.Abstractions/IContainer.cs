@@ -77,19 +77,5 @@ namespace Rigger.ManagedTypes
         {
             return Services.GetService(type) != null;
         }
-
-        /// <summary>
-        /// Load an Ingot, a Type with nested Types that are marked with
-        /// ManagedType attributes.
-        /// </summary>
-        /// <param name="type">The type to load.</param>
-        public void LoadIngot(Type type);
-
-        /// <summary>
-        /// Load an Ingot, a Type with nested Types that are marked with
-        /// ManagedType attributes.
-        /// </summary>
-        /// <typeparam name="TIngotType">The type to load</typeparam>
-        public void LoadIngot<TIngotType>();
     }
 }

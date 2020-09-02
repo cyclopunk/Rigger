@@ -8,7 +8,7 @@ namespace Rigger
     /**
      * Logger that will log to the console.
      */
-    public class ConsoleLogger : AbstractLoggingService 
+    public class ConsoleLogger : AbstractLoggingService , ILoggerFactory
     {
         private const string LogName = "seriLogger";
         
@@ -24,5 +24,19 @@ namespace Rigger
             LoggerFactory = new SerilogLoggerFactory(seriLogger, false);
         }
 
+        public void Dispose()
+        {
+            LoggerFactory.Dispose();
+        }
+
+        public Microsoft.Extensions.Logging.ILogger CreateLogger(string categoryName)
+        {
+            return LoggerFactory.CreateLogger(categoryName);
+        }
+
+        public void AddProvider(ILoggerProvider provider)
+        {
+            LoggerFactory.AddProvider(provider);
+        }
     }
 }

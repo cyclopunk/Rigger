@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Rigger.Configuration;
 using Rigger.Extensions;
 using Rigger.Reflection;
-using Rigger.ManagedTypes.ServiceLocator;
 using Rigger.Attributes;
 using Rigger.Injection;
 
@@ -45,7 +44,7 @@ namespace Rigger.ManagedTypes.Implementations
         
         private static IDictionary<Type, ConstructorInfo> ctorCache =
             new Dictionary<Type, ConstructorInfo>();
-        private readonly IContainer _container;
+
         private readonly Type _typeToConstruct;
 
         public IServices Services { get; set; }
@@ -53,11 +52,6 @@ namespace Rigger.ManagedTypes.Implementations
         public ManagedConstructorInvoker()
         {
 
-        }
-        public ManagedConstructorInvoker(IContainer container, Type typeToConstruct)
-        {
-            this._container = container;
-            this._typeToConstruct = typeToConstruct;
         }
 
         public object Construct<T>(params object[] parameters)

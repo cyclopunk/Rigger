@@ -2,8 +2,14 @@
 using Microsoft.Extensions.Logging;
 using Rigger;
 using Rigger.Attributes;
+using Rigger.Implementations;
 using Rigger.Injection;
 using Rigger.ManagedTypes;
+using Rigger.ManagedTypes.ComponentHandlers;
+using Rigger.ManagedTypes.ComponentScanners;
+using Rigger.ManagedTypes.Features;
+using Rigger.ManagedTypes.Implementations;
+using Rigger.Reflection;
 
 namespace Drone.Bootstrap
 {
@@ -15,7 +21,17 @@ namespace Drone.Bootstrap
     {
         public DefaultModule(Services services)
         {
-            services.Add(typeof(ILogger<>), typeof(ConsoleLogger));
+            services.Add(typeof(ILoggerFactory), typeof(ConsoleLogger))
+                .Add<IAutowirer>(new ContainerAutowirer()) // add autowiring
+                .Add<IComponentHandler<SingletonAttribute>, SingletonComponentHandler>() 
+                .Add<IComponentHandler<ManagedAttribute>, ManagedComponentHandler>()
+                .Add<IComponentScanner, SingletonComponentScanner>() 
+                .Add<IComponentScanner, ManagedComponentScanner>()
+                .Add(typeof(ILogger<>), typeof(Logger<>))
+                .Add<IConstructorActivator>(new ManagedConstructorInvoker())
+                .Add<IInstanceFactory>(new AutowireInstanceFactory());
+
+
         }
     }
 }
