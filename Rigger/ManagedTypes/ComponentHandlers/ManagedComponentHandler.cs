@@ -15,7 +15,7 @@ namespace Rigger.ManagedTypes.ComponentHandlers
     {
         public IServices Services { get; set; }
 
-        [Autowire] private ILogger _logger;
+        [Autowire] private ILogger<ManagedComponentHandler> _logger;
 
         public void HandleComponent(Type type)
         {
@@ -25,12 +25,11 @@ namespace Rigger.ManagedTypes.ComponentHandlers
 
                 // the provided ServiceType on the attribute, the first interface or the concrete type is used (in that priority) as 
                 // the lookup type.
-                /*var lookupType = attribute.LookupType ?? type.GetInterfaces().FirstOr(type);
+                var lookupType = attribute.LookupType ?? type.GetInterfaces().FirstOr(type);
 
-                var typeRegistration = _registry.Register(attribute.Scoped ? RegistrationType.Scoped : RegistrationType.Transient,
-                                           lookupType, type);
+                var typeRegistration = Services.Add(lookupType, type);
 
-                _logger.LogInformation($"FORGE: Registered {typeRegistration} managed type {type} as {lookupType}");*/
+                _logger.LogInformation($"FORGE: Registered {typeRegistration} managed type {type} as {lookupType}");
             }
         }
     }

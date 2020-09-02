@@ -163,15 +163,15 @@ namespace Rigger.Injection
         /// </summary>
         /// <param name="desc"></param>
         /// <returns></returns>
-        internal IServiceInstance GetServiceInstance(ServiceDescription desc)
+        internal IServiceInstance GetServiceInstance(ServiceLifecycle lifecycle, Type implType)
         {
-            return desc.LifeCycle switch
+            return lifecycle switch
             {
                 ServiceLifecycle.Singleton => new SingletonServiceInstance
-                    {InstanceType = desc.ImplementationType}.AddServices(this),
+                    {InstanceType = implType}.AddServices(this),
                 ServiceLifecycle.Thread =>new ThreadServiceInstance
-                    {InstanceType = desc.ImplementationType}.AddServices(this),
-                _ => new DefaultServiceInstance {InstanceType = desc.ImplementationType}.AddServices(this)
+                    {InstanceType = implType}.AddServices(this),
+                _ => new DefaultServiceInstance {InstanceType = implType}.AddServices(this)
             };
         }
 
@@ -200,7 +200,7 @@ namespace Rigger.Injection
             desc?.AllTypes()?.ForEach(o =>
             {
                 // create an instance activator for all types if one doesn't exist
-                var instance = _instanceMap.GetOrPut(o, () => GetServiceInstance(desc));
+                var instance = _instanceMap.GetOrPut(o, () => GetServiceInstance(desc.LifeCycle, o));
                 
                 // add it to the list using the method accessor
 
@@ -267,7 +267,7 @@ namespace Rigger.Injection
                     if (desc.Factory != null)
                         return desc.Factory(this, serviceType.GetGenericArguments().First());
 
-                    IServiceInstance instance = GetServiceInstance(desc);
+                    IServiceInstance instance = GetServiceInstance(desc.LifeCycle, desc.ImplementationType);
 
                     _instanceMap.Add(serviceType, instance);
 

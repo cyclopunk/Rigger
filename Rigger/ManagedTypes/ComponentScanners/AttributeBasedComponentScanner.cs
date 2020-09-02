@@ -16,15 +16,14 @@ namespace Rigger.ManagedTypes.ComponentScanners
     /// that attribute if it is registered with the container.
     /// </summary>
     /// <typeparam name="TAttribute"></typeparam>
-    public class AttributeBasedComponentScanner<TAttribute> : IComponentScanner<List<Type>> where TAttribute : Attribute
+    public class AttributeBasedComponentScanner<TAttribute> : IComponentScanner where TAttribute : Attribute
     {
 
         public IServices Services { get; set; }
 
-        [Autowire] private IContainer _container;
-        public List<Type> ComponentScan(params Assembly[] assemblies)
+        public IEnumerable<Type> ComponentScan(params Assembly[] assemblies)
         {
-            var handler = _container.Get<IComponentHandler<TAttribute>>();
+            var handler = Services.GetService<IComponentHandler<TAttribute>>();
 
             var foundAttributeTypes = assemblies.Map(assembly => assembly.TypesWithAttribute<TAttribute>())
                 .Combine().ToList();

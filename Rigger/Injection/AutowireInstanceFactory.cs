@@ -15,6 +15,11 @@ namespace Rigger.Injection
 
             var instance = invoker?.Construct(type, new object[] {});
 
+            if (instance is IServiceAware i)
+            {
+                i.Services = Services;
+            }
+
             autowire?.Inject(instance);
 
             return instance;

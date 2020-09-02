@@ -15,7 +15,7 @@ namespace Rigger.ManagedTypes.ComponentScanners
     /// Component Scanner that provides the default handling of classes with the Bootstrap class
     /// attribute.
     /// </summary>
-    public class BootstrapComponentScanner : IComponentScanner<IEnumerable<Type>>
+    public class BootstrapComponentScanner : IComponentScanner
     {
         public IServices Services { get; set; }
         [Autowire] private IContainer Container { get; set; }
