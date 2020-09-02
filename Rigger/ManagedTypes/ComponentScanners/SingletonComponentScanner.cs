@@ -14,12 +14,11 @@ namespace Rigger.ManagedTypes.ComponentScanners
     /// <summary>
     /// Component scanner that will scan an assembly for singletons.
     /// </summary>
-    public class SingletonComponentScanner : IComponentScanner<IEnumerable<Type>>
+    public class SingletonComponentScanner : IComponentScanner
     {
         public IServices Services { get; set; }
 
-        [Autowire] private IContainer _container;
-        [Autowire] private ILogger _logger;
+        [Autowire] private ILogger<ManagedComponentHandler> _logger;
         [Autowire] private IComponentHandler<SingletonAttribute> Handler { get; set; }
         public IEnumerable<Type> ComponentScan(params Assembly[] assemblies)
         {

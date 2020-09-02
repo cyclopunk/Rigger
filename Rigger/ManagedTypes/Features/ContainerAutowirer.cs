@@ -1,4 +1,5 @@
-﻿using Rigger.Extensions;
+﻿using System;
+using Rigger.Extensions;
 using Rigger.Exceptions;
 using Rigger.Attributes;
 using Rigger.Injection;
@@ -10,17 +11,16 @@ namespace Rigger.ManagedTypes.Features
     /// </summary>
     public class ContainerAutowirer : IAutowirer, IServiceAware
     {
-        [Autowire]
-        private IContainer _container;
         public IServices Services { get; set; }
 
         public TRType Inject<TRType>(TRType objectToInjectTo)
         {
+            if (objectToInjectTo == null) throw new ArgumentNullException(nameof(objectToInjectTo));
             // inject into properties
             objectToInjectTo.GetType().PropertyWithAttribute<AutowireAttribute>().ForEach(property =>
             {
                 // get an instance of the type that is being autowired.
-                var instance = Services.GetService(property.PropertyType) ?? _container.Get(property.PropertyType);
+                var instance = Services.GetService(property.PropertyType);
 
                 if (instance == null)
                 {
@@ -36,7 +36,7 @@ namespace Rigger.ManagedTypes.Features
                 .FieldsWithAttribute<AutowireAttribute>()
                 .ForEach(field =>
                 {
-                    var instance = Services.GetService(field.FieldType) ?? _container.Get(field.FieldType);
+                    var instance = Services.GetService(field.FieldType);
 
                     if (instance == null)
                     {

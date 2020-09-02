@@ -14,7 +14,7 @@ namespace Rigger.ManagedTypes.ComponentScanners
     /// <summary>
     /// Component scanner that will handle bootstrap classes (Lifecyces, Bootstraps, Configuration)
     /// </summary>
-    public class RootConfigurationComponentScanner : IComponentScanner<IEnumerable<Type>>
+    public class RootConfigurationComponentScanner : IComponentScanner
     {
         public IServices Services { get; set; }
         [Autowire] private IContainer Container { get; set; }

@@ -15,10 +15,9 @@ namespace Rigger.ManagedTypes.ComponentScanners
     /// Search for managed components. This should be ran last as they may depend on singletons and
     /// other autowire types.
     /// </summary>
-    public class ManagedComponentScanner : IComponentScanner<IEnumerable<Type>>
+    public class ManagedComponentScanner : IComponentScanner
     {
         public IServices Services { get; set; }
-        [Autowire] private IContainer _container;
         [Autowire] private IComponentHandler<ManagedAttribute> Handler;
         
         public IEnumerable<Type> ComponentScan(params Assembly[] assemblies)
