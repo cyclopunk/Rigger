@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using Rigger.Extensions;
 using Rigger.Dependencies;
 using Rigger.ManagedTypes.ComponentHandlers;
@@ -17,21 +18,23 @@ namespace Rigger.ManagedTypes.ComponentScanners
     public class RootConfigurationComponentScanner : IComponentScanner
     {
         public IServices Services { get; set; }
-        [Autowire] private IContainer Container { get; set; }
         [Autowire] private IComponentHandler<ConfigurationAttribute> ConfigurationHandler { get; set; }
-
+        [Autowire] private ILogger<RootConfigurationComponentScanner> _logger;
 
         public DependencyTree BootstrapDependencyTree { get; set; } = new DependencyTree();
         public IEnumerable<Type> ComponentScan(params Assembly[] assemblies)
         {
-            /*
+            if (ConfigurationHandler == null)
+            {
+                _logger.LogWarning("Configuration Attribute handler could not be found");
+                return null;
+            }
             assemblies
                 .Select(a => a.TypesWithInterface<ILifecycle>())
                 .Combine()
                 .ForEach(o =>
                 {
-                    Container.Context.TypeRegistry.Register(RegistrationType.Ephemeral,
-                        o, o);
+                    Services.Add(o, o);
                 });
 
 
@@ -42,7 +45,7 @@ namespace Rigger.ManagedTypes.ComponentScanners
                 .OrderByDescending(x => x.GetCustomAttribute<ConfigurationAttribute>().Priority)
                 .ForEach(ConfigurationHandler.HandleComponent);
 
-            */
+            
             return null;
         }
     }

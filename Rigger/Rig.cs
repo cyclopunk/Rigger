@@ -6,17 +6,11 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Rigger.Extensions;
-using Rigger.Reflection;
-using Rigger.Events;
-using Rigger.Exceptions;
 using Rigger.ManagedTypes.ComponentHandlers;
-using Rigger.ManagedTypes.ComponentScanners;
 using Rigger.Attributes;
 using Rigger.Injection;
 using Rigger.ManagedTypes;
-using Rigger.ManagedTypes.Implementations;
-using Rigger.ManagedTypes.Implmentors;
-using Rigger.ManagedTypes.ServiceLocator;
+using Rigger.ManagedTypes.ComponentScanners;
 
 namespace Rigger {
     /// <summary>
@@ -31,13 +25,8 @@ namespace Rigger {
     public class Rig : IContainer
    {
 
-       private static string PLUGIN_NAMESPACE = "Rigger.Drone";
+       private static string PLUGIN_NAMESPACE = "Drone";
 
-       private ILogger logger;
-       public Assembly[] ScannedAssemblies { get; set; }
-       public Type[] Ingots { get; protected set; }
-
-       public bool IsValidated { get; protected set; }
        public IServices Services { get; set; }
 
        public TInstance Get<TInstance>(params object[] constructorParams) where TInstance : class
@@ -91,7 +80,7 @@ namespace Rigger {
            // ServiceLifecycle attributes from Traits
            autoScannedAssemblies.Add(typeof(ILifecycle).Assembly);
 
-           logger.LogInformation($"Default assemblies: {string.Join(",",autoScannedAssemblies.Select(o=>o.FullName))}");
+           //logger.LogInformation($"Default assemblies: {string.Join(",",autoScannedAssemblies.Select(o=>o.FullName))}");
 
            return autoScannedAssemblies.Distinct().ToArray();
        }
@@ -113,7 +102,7 @@ namespace Rigger {
        {
            var path = AppDomain.CurrentDomain.BaseDirectory;
 
-           logger.LogInformation($"Searching app directory {path} for DLLs starting with " + namespaceString);
+           //logger.LogInformation($"Searching app directory {path} for DLLs starting with " + namespaceString);
 
            Directory.GetFiles(path, "*.dll")
                .Where(o =>
@@ -132,7 +121,7 @@ namespace Rigger {
 
            var domain = AppDomain.CurrentDomain.GetAssemblies();
 
-           logger.LogInformation($"Domain assemblies: {string.Join(",",domain.Select(o => o.FullName))})");
+           //logger.LogInformation($"Domain assemblies: {string.Join(",",domain.Select(o => o.FullName))})");
 
        }
 
@@ -149,38 +138,10 @@ namespace Rigger {
            Build(DefaultAssemblies().Concat(assemblies).ToArray());
        }
 
-       /// <summary>
-       /// Create an application container that will load the provided ingot.
-       ///
-       /// This will autobuild the container with the ingot and the default assemblies from all
-       /// Rig modules and the executing / calling assembly.
-       /// 
-       /// </summary>
-       /// <param name="ingotTypes">An Ingot to load</param>
-       public Rig(Type ingotTypes) : this(new []{ ingotTypes })
-       {
-
-       }
-
-       /// <summary>
-       /// Builds an application container with the ingots loaded.
-       ///
-       /// This will autobuild the container with the ingot and the default assemblies from all
-       /// Rig modules and the executing / calling assembly.
-       /// </summary>
-       /// <param name="ingotTypes"></param>
-       public Rig(Type[] ingotTypes)
-       {
-           Ingots = ingotTypes;
-           // Build with the basic stack
-           Build(DefaultAssemblies()); 
-
-           ingotTypes.ForEach(LoadIngot);
-       }
 
        public Rig(string namespaceString)
        {
-           logger.LogInformation($"Searching domain {namespaceString} for Forge artifacts.");
+           //logger.LogInformation($"Searching domain {namespaceString} for Forge artifacts.");
            Build(DefaultAssemblies().Concat(SearchAppDomain(namespaceString)).ToArray()); 
        }
 
@@ -190,42 +151,38 @@ namespace Rigger {
         /// </summary>
         /// <param name="assemblies">The assemblies that will be used to build the application.</param>
         public void Build(params Assembly[] assemblies)
-        {
-            logger = Services.GetService<ILogger<Rig>>();
+       {
 
-            logger.LogInformation($"[FORGE] Scanning the following assemblies: {string.Join(",", assemblies.Select(o => o.FullName))}");
+            Services = new Services();
 
-            ScannedAssemblies = assemblies;
+            // bootstrap by adding the module
 
-            // scan the assemblies and ingots for the rest of the application.
+            Services
+                .Add<ModuleComponentScanner, ModuleComponentScanner>(ServiceLifecycle.Singleton)
+                .GetService<ModuleComponentScanner>()
+                .ComponentScan(assemblies);
+
+            var logger = Services.GetService<ILogger<Rig>>();
             
-           
+            var scanners = Services.GetService<IEnumerable<IComponentScanner>>();
+
+            scanners.ForEach(o =>
+            {
+                try
+                {
+                    o.ComponentScan(assemblies);
+                }
+                catch (Exception e)
+                {
+                    logger.LogError(e, $"Could not build component with scanner {o}");
+                    throw;
+                }
+            });
+
             IsBuilt = true;
-
-            // TODO Add component scanning back
-
-            logger.LogInformation($"FORGE: Scanned the following assemblies: {string.Join(",", assemblies.Select(o => o.FullName))}");
-
-            logger.LogInformation($"FORGE: Validating the container.");
-
-            // TODO validation logic
-
-            logger.LogInformation($"FORGE: Firing OnBuilt for all Managed Types");
-            
-            IsValidated = true;
         }
 
-        public void LoadIngot(Type t)
-        {
-           
-        }
-
-        public void LoadIngot<TIngotType>()
-        {
-            LoadIngot(typeof(TIngotType));
-        }
-
-        /// <summary>
+       /// <summary>
         /// Method that is called when the application is disposed of. Clears all resources,
         /// instances, caches, etc that are associated with the container. Calls the OnDestroy hook
         /// of all managed instances.
