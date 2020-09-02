@@ -1,4 +1,4 @@
-﻿namespace TheCommons.Forge.ManagedTypes
+﻿namespace Rigger.ManagedTypes
 {
     public interface IRegistration
     {

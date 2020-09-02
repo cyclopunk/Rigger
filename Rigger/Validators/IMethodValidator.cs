@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace TheCommons.Forge.Validators
+namespace Rigger.Validators
 {
     /// <summary>
     /// <exception cref="MethodValidationException">This exception is thrown if there is a validation error</exception>

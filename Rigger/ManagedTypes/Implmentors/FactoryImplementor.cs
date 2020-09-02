@@ -1,8 +1,8 @@
 ﻿using System;
-using TheCommons.Forge.ManagedTypes;
-using TheCommons.Forge.ManagedTypes.Implmentors;
+using Rigger.ManagedTypes;
+using Rigger.ManagedTypes.Implmentors;
 
-namespace TheCommons.Forge.ManagedTypes.ServiceLocator
+namespace Rigger.ManagedTypes.ServiceLocator
 {
     public abstract class FactoryImplementor : IImplementor
     {

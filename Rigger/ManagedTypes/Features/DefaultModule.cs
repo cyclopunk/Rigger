@@ -1,19 +1,18 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
-using TheCommons.Core.Configuration;
-using TheCommons.Core.Configuration.Sources;
-using TheCommons.Core.ValueConverters;
-using TheCommons.Forge.ManagedTypes.ComponentHandlers;
-using TheCommons.Forge.ManagedTypes.ComponentScanners;
-using TheCommons.Forge.ManagedTypes.Lightweight;
-using TheCommons.Forge.ManagedTypes.Resolvers;
-using TheCommons.Logging;
-using TheCommons.Traits.Attributes;
+using Rigger.Configuration;
+using Rigger.Configuration.Sources;
+using Rigger.ManagedTypes.ComponentHandlers;
+using Rigger.ManagedTypes.ComponentScanners;
+using Rigger.ManagedTypes.Lightweight;
+using Rigger.ManagedTypes.Resolvers;
+using Rigger;
+using Rigger.Attributes;
 
-namespace TheCommons.Forge.ManagedTypes.Features
+namespace Rigger.ManagedTypes.Features
 {
     /// <summary>
-    /// THis module provides the default behavior for Crucible. It contains the basic component scanners
+    /// THis module provides the default behavior for Rig. It contains the basic component scanners
     /// for all ManagedType attributes as well as default implementations of the instance factory, type registries
     /// and configuration service.
     ///
@@ -27,7 +26,7 @@ namespace TheCommons.Forge.ManagedTypes.Features
         public Services Services { get; set; }
         public DefaultModule(Services services)
         {
-            services.Add(typeof(ILogger<>), typeof(ConsoleLogger<>));
+            //services.Add(typeof(ILogger<>), typeof(ConsoleLogger<>));
             /*
             ctx.EventRegistry = new EventRegistry();
             ctx.ConfigurationService = new DefaultConfigurationService().AddSource(new MapConfigurationSource());

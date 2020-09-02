@@ -44,7 +44,7 @@ steps:
   displayName: 'DotNet Pack'
   inputs:
     command: 'pack'
-    packagesToPack: '**/TheCommons.Forge.csproj'
+    packagesToPack: '**/Rigger.csproj'
     versioningScheme: byEnvVar
     versionEnvVar: GitVersion.NuGetVersion
 

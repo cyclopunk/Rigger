@@ -4,14 +4,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
-using TheCommons.Core.Configuration;
-using TheCommons.Core.Extensions;
-using TheCommons.Core.Reflection;
-using TheCommons.Forge.ManagedTypes.Lightweight;
-using TheCommons.Forge.ManagedTypes.ServiceLocator;
-using TheCommons.Traits.Attributes;
+using Rigger.Configuration;
+using Rigger.Extensions;
+using Rigger.Reflection;
+using Rigger.ManagedTypes.Lightweight;
+using Rigger.ManagedTypes.ServiceLocator;
+using Rigger.Attributes;
 
-namespace TheCommons.Forge.ManagedTypes.Implementations
+namespace Rigger.ManagedTypes.Implementations
 {
 
     public class ScopedConstructorInvoker : IConstructorInvoker

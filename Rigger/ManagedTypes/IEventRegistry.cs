@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace TheCommons.Forge.ManagedTypes
+namespace Rigger.ManagedTypes
 {
     public interface IEventRegistry
     {

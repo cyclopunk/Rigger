@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheCommons.Forge.ManagedTypes.ComponentHandlers
+namespace Rigger.ManagedTypes.ComponentHandlers
 {
     public class ContainerOptionsAttribute : Attribute
     {

@@ -1,9 +1,9 @@
 ﻿using System;
-using TheCommons.Forge.ManagedTypes;
-using TheCommons.Forge.ManagedTypes.Lightweight;
-using TheCommons.Traits.Attributes;
+using Rigger.ManagedTypes;
+using Rigger.ManagedTypes.Lightweight;
+using Rigger.Attributes;
 
-namespace TheCommons.Forge.ManagedTypes.ComponentHandlers
+namespace Rigger.ManagedTypes.ComponentHandlers
 {
     public class BootstrapComponentHandler : IComponentHandler<BootstrapAttribute>
     {

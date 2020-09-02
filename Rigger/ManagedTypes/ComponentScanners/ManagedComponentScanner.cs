@@ -3,13 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using TheCommons.Core.Extensions;
-using TheCommons.Forge.ManagedTypes.ComponentHandlers;
-using TheCommons.Traits.Attributes;
-using TheCommons.Forge.ManagedTypes;
-using TheCommons.Forge.ManagedTypes.Lightweight;
+using Rigger.Extensions;
+using Rigger.ManagedTypes.ComponentHandlers;
+using Rigger.Attributes;
+using Rigger.ManagedTypes;
+using Rigger.ManagedTypes.Lightweight;
 
-namespace TheCommons.Forge.ManagedTypes.ComponentScanners
+namespace Rigger.ManagedTypes.ComponentScanners
 {
     /// <summary>
     /// Search for managed components. This should be ran last as they may depend on singletons and

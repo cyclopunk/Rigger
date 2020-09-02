@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheCommons.Forge.Dependencies
+namespace Rigger.Dependencies
 {
     /// <summary>
     /// Interface for a dependency resolver. This can be passed to a dependency tree

@@ -4,21 +4,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using TheCommons.Core.Extensions;
-using TheCommons.Traits.Attributes;
-using TheCommons.Forge.ManagedTypes.Implementations;
+using Rigger.Extensions;
+using Rigger.Attributes;
+using Rigger.ManagedTypes.Implementations;
+using Rigger.ManagedTypes.Lightweight;
 
-namespace TheCommons.Forge.ManagedTypes
+namespace Rigger.ManagedTypes
 {
     /// <summary>
     /// Check an object for event listener methods and register those methods
     /// </summary>
     /// <param name="instance"></param>
     /// <returns></returns>
-    public class EventRegistry : IEventRegistry
+    public class EventRegistry : IEventRegistry, IServiceAware
     {
-        [Autowire] private IContainer _container;
-
+        public Services Services { get; set; }
+        
         /// <summary>
         /// Thread-safe storage of instance event registration.
         /// TODO registration maintenance
@@ -37,7 +38,7 @@ namespace TheCommons.Forge.ManagedTypes
                 {
                     Receiver = instance,
                     EventType = attr.Event,
-                    Invoker = _container.Context.Inject(new ManagedMethodInvoker(instance.GetType(), o.Name))
+                    Invoker = new ManagedMethodInvoker(instance.GetType(), o.Name)
                 };
 
                 _eventRegistry.Add(registration);
@@ -66,10 +67,13 @@ namespace TheCommons.Forge.ManagedTypes
         }
         public async Task FireAsync(object eventToFire)
         {
-            var tasks = _eventRegistry.ToList().FindAll(f => f.EventType == eventToFire.GetType())
-                .Map(o => Task.Run( () => o.Invoker.Invoke(o.Receiver, eventToFire)));
+            /*var tasks = _eventRegistry.ToList().FindAll(f => f.EventType == eventToFire.GetType())
+                .Map(o => Task.Run( () =>
+                {
+                    if (o != null) return o.Invoker.Invoke(o.Receiver, eventToFire);
+                }));
 
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks);*/
         }
     }
 }

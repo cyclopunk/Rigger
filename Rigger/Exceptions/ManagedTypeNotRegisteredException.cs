@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheCommons.Forge.Exceptions
+namespace Rigger.Exceptions
 {
     /// <summary>
     /// This exception is thrown when a managed type is not registered and is looked up

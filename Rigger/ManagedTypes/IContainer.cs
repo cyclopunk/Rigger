@@ -1,8 +1,8 @@
 ﻿using System;
-using TheCommons.Forge.Exceptions;
-using TheCommons.Forge.ManagedTypes.Lightweight;
+using Rigger.Exceptions;
+using Rigger.ManagedTypes.Lightweight;
 
-namespace TheCommons.Forge.ManagedTypes
+namespace Rigger.ManagedTypes
 {
     /// <summary>
     /// Interface for an application container that manages instances of objects as well as services

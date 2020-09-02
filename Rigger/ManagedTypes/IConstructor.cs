@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheCommons.Forge.ManagedTypes
+namespace Rigger.ManagedTypes
 {
     public interface IConstructorInvoker<T>
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
-using TheCommons.Forge.ManagedTypes.Implementations;
+using Rigger.ManagedTypes.Implementations;
 
-namespace TheCommons.Forge.ManagedTypes.Lightweight
+namespace Rigger.ManagedTypes.Lightweight
 {
     /// <summary>
     /// Service Instance that uses a ThreadLocal

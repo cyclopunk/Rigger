@@ -5,13 +5,13 @@ using System.Linq.Dynamic.Core;
 using System.Linq.Dynamic.Core.Parser;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using TheCommons.Core.Configuration;
-using TheCommons.Forge.Exceptions;
-using TheCommons.Forge.ManagedTypes.Features;
-using TheCommons.Traits.Attributes;
+using Rigger.Configuration;
+using Rigger.Exceptions;
+using Rigger.ManagedTypes.Features;
+using Rigger.Attributes;
 using Expression = System.Linq.Expressions.Expression;
 
-namespace TheCommons.Forge.ManagedTypes.Resolvers
+namespace Rigger.ManagedTypes.Resolvers
 {
     /// <summary>
     /// Type resolver that can lookup a type based on a configuration and the result of an expression.

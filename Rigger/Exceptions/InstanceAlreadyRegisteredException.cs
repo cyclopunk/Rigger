@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheCommons.Forge.Lifecycle
+namespace Rigger.Lifecycle
 {
     /// <summary>
     /// Exception that is thrown if an instance is already registered with the container.

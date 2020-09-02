@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TheCommons.Forge.Dependencies
+namespace Rigger.Dependencies
 {
    /// <summary>
    /// A node on the dependency tree.

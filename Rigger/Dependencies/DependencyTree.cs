@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using TheCommons.Core.Extensions;
-using TheCommons.Traits.Attributes;
+using Rigger.Extensions;
+using Rigger.Attributes;
 
-namespace TheCommons.Forge.Dependencies
+namespace Rigger.Dependencies
 {
     public class DependencyTree
     {

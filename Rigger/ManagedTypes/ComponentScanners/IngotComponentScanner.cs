@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using TheCommons.Core.Extensions;
-using TheCommons.Forge.ManagedTypes.Lightweight;
-using TheCommons.Traits.Attributes;
+using Rigger.Extensions;
+using Rigger.ManagedTypes.Lightweight;
+using Rigger.Attributes;
 
-namespace TheCommons.Forge.ManagedTypes.ComponentScanners
+namespace Rigger.ManagedTypes.ComponentScanners
 {
     public class IngotAttribute : Attribute
     {

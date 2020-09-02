@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TheCommons.Forge.ManagedTypes.Lightweight
+namespace Rigger.ManagedTypes.Lightweight
 {
     public class ServiceDescription
     {

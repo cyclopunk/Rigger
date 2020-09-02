@@ -1,15 +1,14 @@
 ﻿using System;
-using TheCommons.Forge.ManagedTypes.Implementations;
-using TheCommons.Forge.ManagedTypes;
-using TheCommons.Forge.ManagedTypes.Resolvers;
-using TheCommons.Traits.Attributes;
+using Rigger.ManagedTypes.Implementations;
+using Rigger.ManagedTypes;
+using Rigger.ManagedTypes.Resolvers;
+using Rigger.Attributes;
 
-namespace TheCommons.Forge.ManagedTypes.ServiceLocator
+namespace Rigger.ManagedTypes.ServiceLocator
 {
     public class TransientImplementor : FactoryImplementor
     {
         private IContainer _container;
-        private TypeManager _manager;
         private ManagedConstructorInvoker invoker;
         public TransientImplementor(IContainer container, Func<Type> typeFactory) : base(typeFactory)
         {
@@ -18,7 +17,8 @@ namespace TheCommons.Forge.ManagedTypes.ServiceLocator
 
         public override object GetInstance(params object[] implementorParams)
         {
-            
+            /*
+
             var type = TypeFactory();
             _manager ??= new TypeManager(_container, type);
             invoker ??= new ManagedConstructorInvoker(_container, type);
@@ -33,7 +33,8 @@ namespace TheCommons.Forge.ManagedTypes.ServiceLocator
 
             resolver?.Resolve(instance);
 
-            return instance;
+            return instance;*/
+            return null;
         }
     }
 }

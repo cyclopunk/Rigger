@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheCommons.Forge.ManagedTypes.Resolvers
+namespace Rigger.ManagedTypes.Resolvers
 {
     public interface ITypeResolver
     {

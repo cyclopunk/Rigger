@@ -1,8 +1,8 @@
-﻿using TheCommons.Forge.ManagedTypes;
-using TheCommons.Forge.ManagedTypes.Lightweight;
-using TheCommons.Forge.ManagedTypes.ServiceLocator;
+﻿using Rigger.ManagedTypes;
+using Rigger.ManagedTypes.Lightweight;
+using Rigger.ManagedTypes.ServiceLocator;
 
-namespace TheCommons.Forge.Events
+namespace Rigger.Events
 {
     public class TypeRegisteredEvent : ContainerEvent
     {

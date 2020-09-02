@@ -1,6 +1,6 @@
-﻿using TheCommons.Traits.Attributes;
+﻿using Rigger.Attributes;
 
-namespace TheCommons.Forge.ManagedTypes
+namespace Rigger.ManagedTypes
 {
     /// <summary>
     /// Interface for classes that will autowire an instance. How autowiring

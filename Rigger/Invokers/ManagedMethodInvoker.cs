@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using TheCommons.Core.Extensions;
-using TheCommons.Core.Reflection;
-using TheCommons.Forge.Exceptions;
-using TheCommons.Traits.Attributes;
+using Rigger.Extensions;
+using Rigger.Reflection;
+using Rigger.Exceptions;
+using Rigger.Attributes;
 
-namespace TheCommons.Forge.ManagedTypes.Implementations
+namespace Rigger.ManagedTypes.Implementations
 {
     /// <summary>
     ///  This method invoker will resolve types if there for support of service resolution of parameters.

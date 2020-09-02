@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using TheCommons.Core.Extensions;
-using TheCommons.Forge.ManagedTypes.ComponentScanners;
-using TheCommons.Forge.ManagedTypes.Lightweight;
-using TheCommons.Traits.Attributes;
+using Rigger.Extensions;
+using Rigger.ManagedTypes.ComponentScanners;
+using Rigger.ManagedTypes.Lightweight;
+using Rigger.Attributes;
 
-namespace TheCommons.Forge.ManagedTypes.ComponentHandlers
+namespace Rigger.ManagedTypes.ComponentHandlers
 {
     /// <summary>
     /// Component Handler for Ingots. Ingots are classes that contain

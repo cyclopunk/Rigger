@@ -3,17 +3,17 @@ using System.Diagnostics;
 using BenchmarkDotNet.Loggers;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using TheCommons.Forge.ManagedTypes;
-using TheCommons.Forge.ManagedTypes.Features;
-using TheCommons.Forge.ManagedTypes.Implementations;
-using TheCommons.Forge.ManagedTypes.Lightweight;
-using TheCommons.Logging.Implementations;
-using TheCommons.Traits.Attributes;
+using Rigger.ManagedTypes;
+using Rigger.ManagedTypes.Features;
+using Rigger.ManagedTypes.Implementations;
+using Rigger.ManagedTypes.Lightweight;
+using Rigger.Attributes;
+using Rigger.Implementations;
 using Xunit;
 using Xunit.Abstractions;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace TheCommons.Forge.Tests {
+namespace Rigger.Tests {
     public interface ISingletonService
 {
 }

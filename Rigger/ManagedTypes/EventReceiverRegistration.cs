@@ -1,7 +1,7 @@
 ﻿using System;
-using TheCommons.Core.Reflection;
+using Rigger.Reflection;
 
-namespace TheCommons.Forge.ManagedTypes
+namespace Rigger.ManagedTypes
 {
     /// <summary>
     /// Registration class for a instance that will be
