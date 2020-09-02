@@ -74,7 +74,7 @@ namespace Rigger.Injection
             return sd.ServiceType.IsInterface;
         }
 
-        public static T AddServices<T>(this T sa, Services s) where T : IServiceAware
+        public static T AddServices<T>(this T sa, IServices s) where T : IServiceAware
         {
             sa.Services = s;
 
