@@ -1,13 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using BenchmarkDotNet.Loggers;
 using FluentAssertions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Rigger.ManagedTypes;
 using Rigger.ManagedTypes.Features;
 using Rigger.ManagedTypes.Implementations;
 using Rigger.ManagedTypes.Lightweight;
 using Rigger.Attributes;
+using Rigger.Extensions;
 using Rigger.Implementations;
 using Xunit;
 using Xunit.Abstractions;
@@ -18,8 +23,9 @@ namespace Rigger.Tests {
 {
 }
    public class SingletonService : ISingletonService
-    {
-    }
+   {
+       [Autowire] public ILogger<SingletonService> logger;
+   }
     public class TransientService
     {
         public SingletonService Option { get; set; }
@@ -114,11 +120,20 @@ namespace Rigger.Tests {
             sd0.MoreSpecificService(sd1).Should().BeEquivalentTo(sd1);
         }
 
-        private Services InitServices()
-        {
+       private Services InitServices()
+       {
+
+           /*var logFactory = new Func<Services, Type, object>((services, type) => {
+           
+               var fac = services.GetService<ILoggerFactory>();
+
+               return null;
+           });*/
+
             return new Services()
                 .Add<IAutowirer>(new ContainerAutowirer())
-                .Add<ILogger>(new TestLogger(output).Logger)
+                .Add<ILoggerFactory>(new TestLogger(output).LoggerFactory)
+                .Add(typeof(ILogger<>), typeof(Logger<>))
                 .Add<IConstructorInvoker>(new ManagedConstructorInvoker())
                 .Add<IInstanceFactory>(new AutowireInstanceFactory())
                 .Add<IOption<SomeOption>, OptionOne>()
@@ -173,6 +188,8 @@ namespace Rigger.Tests {
             aw.Should().BeAssignableTo<AutoWireService>();
 
             aw.service.Should().BeAssignableTo<ISingletonService>();
+                
+            ((SingletonService) aw.service).logger.Should().BeAssignableTo<Logger<SingletonService>>();
         }
 
         [Fact]
@@ -209,9 +226,10 @@ namespace Rigger.Tests {
             {
                 services.GetService<IOption<AnotherOption>>();
             }
+            var logger = services.GetService<ILoggerFactory>().CreateLogger<LightweightServiceTests>();
 
             sw.Stop();
-            services.GetService<ILogger>().LogInformation("Time to make 100k non-autowired objects: " + sw.ElapsedMilliseconds + "ms");
+            logger.LogInformation("Time to make 100k non-autowired objects: " + sw.ElapsedMilliseconds + "ms");
             sw.Restart();
             for (int i = 0; i < 100000; i++)
             {
@@ -220,7 +238,7 @@ namespace Rigger.Tests {
 
             sw.Stop();
             
-            services.GetService<ILogger>().LogInformation("Time to make 100k autowire w/ singleton objects: " + sw.ElapsedMilliseconds + "ms");
+            logger.LogInformation("Time to make 100k autowire w/ singleton objects: " + sw.ElapsedMilliseconds + "ms");
             sw.Restart();
             for (int i = 0; i < 100000; i++)
             {
@@ -229,7 +247,7 @@ namespace Rigger.Tests {
 
             sw.Stop();
 
-            services.GetService<ILogger>().LogInformation("Time to make 100k natural objects: " + sw.ElapsedMilliseconds + "ms");
+            logger.LogInformation("Time to make 100k natural objects: " + sw.ElapsedMilliseconds + "ms");
             
 
             x.Should().NotBeNull();

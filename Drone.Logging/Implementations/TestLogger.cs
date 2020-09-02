@@ -21,9 +21,13 @@ namespace Rigger.Implementations
                     "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}{Properties}")
                 .CreateLogger();
 
+            
+            LoggerFactory = new SerilogLoggerFactory(seriLogger, false);
+
             SerilogLoggerProvider serilogLoggerProvider = new SerilogLoggerProvider(seriLogger);
 
             Logger = serilogLoggerProvider.CreateLogger(LogName);
+
         }
     }
 }
