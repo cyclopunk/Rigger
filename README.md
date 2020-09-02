@@ -2,9 +2,12 @@
 
 Rigger is a framework for dependency injection, inversion of control and container-managed instances. It is a part of a greater project I'm working on. It is being developed to address some feature gaps in common C# DI frameworks. Some may notice that it is very Spring Boot-esq and that is intentional. It is the hope that this platform can be used to quickly build projects with advanced features. 
 
-Rigger is designed to be fast (not as fast as "new", but not as slow as Activtor), lightweight (simple interfaces), extensible (Plugins / Modules) and easy to use (configuration-lite). 
+Rigger is designed to be fast, lightweight, extensible and easy to use (configuration-lite). 
+
+Rigger is also a drop-in replacement for IServiceProvider for dotnetcore projects.
 
 ### Features
++ Component Scanning
 + Attribute based registration and autowiring.
 + Configuration-based Value Injection
 + Transient, Singleton, Scopped and Thread based registrations
@@ -17,17 +20,25 @@ Rigger is designed to be fast (not as fast as "new", but not as slow as Activtor
 + Fail Fast application startup.
 + Managed startup lifecycle and dependency ordering (Module -> Configuration -> Managed -> Singleton -> Bootstrap).
 + Include Additional Drone libraries for added functionality :
-  - Rigged.Cloud, unified cloud services automatically configured and injected into the container
-  - Rigged.API, automatically bootstraps a GraphQL endpoint that integrates your entity model
-  - Rigged.Data, Wide Column Storage, ML Services, And Statistical Services
-  - Rigged.Chronos, Timer functionality for services.
+  - Drone.Cloud, unified cloud services automatically configured and injected into the container
+  - Drone.API, automatically bootstraps a GraphQL endpoint that integrates your entity model
+  - Drone.Data, Wide Column Storage, ML Services, And Statistical Services
+  - Drone.Chronos, Timer functionality for services.
 
 ### TODO 
-- Better Lifecycle Management
+I recently refactored this from another project, so there's a lot to do before I can consider this "stable".
+- Update Docs
+- Reintegrate Events
+- Reintegrate Lifecycle management
+- Reintegrate Conditional Services
+- More benchmarks
+- Convert modules to Rigger Drone framework
+- Scoped DI needs tests (and is probably broken)
+
 
 ## Quickstart
 
-In order to create a application, it is as simple as inheriting from the ApplicationContainer class. Instantiating that class will trigger
+To create a Rigged application, it is as simple as inheriting from the Rig class. Merely instantiating that class, or inheriting from it, will trigger
 the configuration of the application. This will start the component scanning part of the framework and it will discover all components
 that are marked with a Managed Type attribute. You can pass in additional assemblies to the ApplicationContainer constructor in order to 
 include other Assemblies in your application. This will allow a plugin type style of development.
@@ -230,21 +241,10 @@ class ConfigureTestLoggerModule
 {
     public static ITestOutputHelper output;
 
-    [Autowire]
-    public ConfigureTestLoggerModule(ApplicationContext ctx)
+    public ConfigureTestLoggerModule(Services services)
     {
-        ctx.Logger = new TestLogger(output).Logger;
+        services.Replace<ILoggerFactory>(new TestLogger(output).LoggerFactory)
     }
 }
 
-public class AppInContainerTests
-{
-    private ApplicationContainer container;
-    public AppInContainerTests(ITestOutputHelper output)
-    {
-        ConfigureTestLoggerModule.output = output;
-
-        container = new ApplicationContainer();
-    }
-}
 ```
