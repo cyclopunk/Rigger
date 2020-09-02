@@ -10,10 +10,10 @@ using Microsoft.Extensions.Logging;
 using Rigger.ManagedTypes;
 using Rigger.ManagedTypes.Features;
 using Rigger.ManagedTypes.Implementations;
-using Rigger.ManagedTypes.Lightweight;
 using Rigger.Attributes;
 using Rigger.Extensions;
 using Rigger.Implementations;
+using Rigger.Injection;
 using Xunit;
 using Xunit.Abstractions;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -138,7 +138,7 @@ namespace Rigger.Tests {
                 .Add<IInstanceFactory>(new AutowireInstanceFactory())
                 .Add<IOption<SomeOption>, OptionOne>()
                 .Add<IOption<AnotherOption>, OptionTwo>()
-                .Add<ISingletonService, SingletonService>(ManagedTypes.Lightweight.ServiceLifecycle.Singleton)
+                .Add<ISingletonService, SingletonService>(ServiceLifecycle.Singleton)
                 .Add<TransientService, TransientService>();
         }
         public class OptionThree : IOption<SomeOption>

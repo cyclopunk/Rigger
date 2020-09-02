@@ -6,8 +6,8 @@ using System.Reflection;
 using Rigger.Extensions;
 using Rigger.ManagedTypes.ComponentHandlers;
 using Rigger.Attributes;
+using Rigger.Injection;
 using Rigger.ManagedTypes;
-using Rigger.ManagedTypes.Lightweight;
 
 namespace Rigger.ManagedTypes.ComponentScanners
 {
@@ -17,7 +17,7 @@ namespace Rigger.ManagedTypes.ComponentScanners
     /// </summary>
     public class ManagedComponentScanner : IComponentScanner<IEnumerable<Type>>
     {
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
         [Autowire] private IContainer _container;
         [Autowire] private IComponentHandler<ManagedAttribute> Handler;
         

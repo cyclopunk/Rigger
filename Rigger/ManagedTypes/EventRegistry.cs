@@ -6,8 +6,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Rigger.Extensions;
 using Rigger.Attributes;
+using Rigger.Injection;
 using Rigger.ManagedTypes.Implementations;
-using Rigger.ManagedTypes.Lightweight;
 
 namespace Rigger.ManagedTypes
 {
@@ -18,14 +18,14 @@ namespace Rigger.ManagedTypes
     /// <returns></returns>
     public class EventRegistry : IEventRegistry, IServiceAware
     {
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
         
         /// <summary>
         /// Thread-safe storage of instance event registration.
         /// TODO registration maintenance
         /// </summary>
-        private readonly ConcurrentBag<EventReceiver> _eventRegistry = new ConcurrentBag<EventReceiver>();
-        public IEnumerable<EventReceiver> Register(object instance)
+        private readonly ConcurrentBag<IEventReceiver> _eventRegistry = new ConcurrentBag<IEventReceiver>();
+        public IEnumerable<IEventReceiver> Register(object instance)
         {
 
             var methods = instance.GetType().MethodsWithAttribute<OnEventAttribute>();

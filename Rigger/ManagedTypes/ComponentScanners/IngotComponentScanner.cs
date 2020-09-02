@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Rigger.Extensions;
-using Rigger.ManagedTypes.Lightweight;
 using Rigger.Attributes;
+using Rigger.Injection;
 
 namespace Rigger.ManagedTypes.ComponentScanners
 {
@@ -23,7 +23,7 @@ namespace Rigger.ManagedTypes.ComponentScanners
     /// </summary>
     public class IngotComponentScanner : AttributeBasedComponentScanner<IngotAttribute>
     {
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
 
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Rigger.ManagedTypes.Lightweight
+namespace Rigger.Injection
 {
     public interface IInstanceFactory
     {

@@ -5,8 +5,8 @@ using System.Reflection;
 using Rigger.Extensions;
 using Rigger.ManagedTypes.ComponentHandlers;
 using Rigger.Attributes;
+using Rigger.Injection;
 using Rigger.ManagedTypes;
-using Rigger.ManagedTypes.Lightweight;
 
 namespace Rigger.ManagedTypes.ComponentScanners
 {
@@ -19,7 +19,7 @@ namespace Rigger.ManagedTypes.ComponentScanners
     public class AttributeBasedComponentScanner<TAttribute> : IComponentScanner<List<Type>> where TAttribute : Attribute
     {
 
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
 
         [Autowire] private IContainer _container;
         public List<Type> ComponentScan(params Assembly[] assemblies)

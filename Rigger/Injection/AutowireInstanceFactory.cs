@@ -1,15 +1,16 @@
 ﻿using System;
-using Rigger.ManagedTypes.Features;
+using Rigger.ManagedTypes;
+using Rigger.Reflection;
 
-namespace Rigger.ManagedTypes.Lightweight
+namespace Rigger.Injection
 {
     public class AutowireInstanceFactory : IInstanceFactory, IServiceAware
     {
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
 
         public object Make(Type type)
         {
-            IConstructorInvoker invoker = Services.GetService<IConstructorInvoker>();
+            IConstructorActivator invoker = Services.GetService<IConstructorActivator>();
             IAutowirer autowire = Services.GetService<IAutowirer>();
 
             var instance = invoker?.Construct(type, new object[] {});

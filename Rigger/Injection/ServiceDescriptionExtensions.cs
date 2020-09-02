@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace Rigger.ManagedTypes.Lightweight
+namespace Rigger.Injection
 {
     public static class ServiceDescriptionExtensions
     {

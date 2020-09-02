@@ -1,5 +1,5 @@
-﻿using Rigger.ManagedTypes;
-using Rigger.ManagedTypes.Lightweight;
+﻿using Rigger.Injection;
+using Rigger.ManagedTypes;
 using Rigger.ManagedTypes.ServiceLocator;
 
 namespace Rigger.Events

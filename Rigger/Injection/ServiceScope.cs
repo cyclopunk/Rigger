@@ -1,11 +1,11 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Rigger.ManagedTypes.Lightweight
+namespace Rigger.Injection
 {
     public class ServiceScope : IServiceProvider, IServiceScopeFactory, IServiceScope, IServiceAware
     {
-        private Services services;
+        private IServices services;
         private IServiceProvider parent;
 
         private string id = Guid.NewGuid().ToString();
@@ -21,7 +21,7 @@ namespace Rigger.ManagedTypes.Lightweight
 
         public IServiceProvider ServiceProvider => parent;
 
-        public Services Services
+        public IServices Services
         {
             get => services; 
             set => services = value;

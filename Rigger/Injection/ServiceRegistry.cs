@@ -1,8 +1,7 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Rigger.ManagedTypes.Lightweight
+namespace Rigger.Injection
 {
     public class ServiceRegistry : IServiceScopeFactory, IServiceProvider
     {

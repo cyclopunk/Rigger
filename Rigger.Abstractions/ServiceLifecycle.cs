@@ -1,4 +1,4 @@
-﻿namespace Rigger.ManagedTypes.Lightweight
+﻿namespace Rigger.Injection
 {
     public enum ServiceLifecycle
     {

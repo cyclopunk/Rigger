@@ -21,4 +21,8 @@
     <PackageReference Include="System.Linq.Dynamic.Core" Version="1.2.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Rigger.Abstractions\Rigger.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>

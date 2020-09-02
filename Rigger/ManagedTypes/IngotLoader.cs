@@ -4,8 +4,8 @@ using System.Reflection;
 using Rigger.Extensions;
 using Rigger.Reflection;
 using Rigger.Exceptions;
-using Rigger.ManagedTypes.Lightweight;
 using Rigger.Attributes;
+using Rigger.Injection;
 
 namespace Rigger.ManagedTypes
 {

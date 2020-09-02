@@ -1,5 +1,5 @@
 ﻿using System;
-using Rigger.ManagedTypes.Lightweight;
+using Rigger.Injection;
 
 namespace Rigger.ManagedTypes.Implmentors
 {

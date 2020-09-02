@@ -7,19 +7,19 @@ namespace Rigger.ManagedTypes
     /// Registration class for a instance that will be
     /// an event receiver.
     /// </summary>
-    public class EventReceiver : IRegistration
+    public interface IEventReceiver : IRegistration
     {
         /// <summary>
         /// The type of class this registration will respond to
         /// </summary>
-        public Type EventType { get; set; }
+        Type EventType { get; set; }
         /// <summary>
         /// Cached method invoker
         /// </summary>
-        public IMethodInvoker Invoker { get; set; }
+        IMethodInvoker Invoker { get; set; }
         /// <summary>
         /// Object receiver
         /// </summary>
-        public object Receiver { get; set; }
+        object Receiver { get; set; }
     }
 }

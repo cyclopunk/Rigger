@@ -4,10 +4,10 @@ using Rigger.Configuration;
 using Rigger.Configuration.Sources;
 using Rigger.ManagedTypes.ComponentHandlers;
 using Rigger.ManagedTypes.ComponentScanners;
-using Rigger.ManagedTypes.Lightweight;
 using Rigger.ManagedTypes.Resolvers;
 using Rigger;
 using Rigger.Attributes;
+using Rigger.Injection;
 
 namespace Rigger.ManagedTypes.Features
 {
@@ -23,7 +23,7 @@ namespace Rigger.ManagedTypes.Features
     [Module(Priority = -1)]
     public class DefaultModule : IServiceAware
     {
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
         public DefaultModule(Services services)
         {
             //services.Add(typeof(ILogger<>), typeof(ConsoleLogger<>));

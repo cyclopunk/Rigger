@@ -1,6 +1,5 @@
 ﻿using System;
-using Rigger.Exceptions;
-using Rigger.ManagedTypes.Lightweight;
+using Rigger.Injection;
 
 namespace Rigger.ManagedTypes
 {
@@ -13,7 +12,7 @@ namespace Rigger.ManagedTypes
     /// </summary>
     public interface IContainer : IDisposable, IAsyncDisposable, IServiceProvider, IServiceAware
     {
-        Services services { get; set; }
+        IServices Services { get; set; }
       /// <summary>
         /// Get a managed instance of the type provided
         /// </summary>
@@ -76,7 +75,7 @@ namespace Rigger.ManagedTypes
         /// <returns>True if the type is managed, false if not.</returns>
         public bool IsManaged(Type type)
         {
-            return Services.Get(type) != null;
+            return Services.GetService(type) != null;
         }
 
         /// <summary>

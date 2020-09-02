@@ -1,7 +1,7 @@
 ﻿using Rigger.Extensions;
 using Rigger.Exceptions;
-using Rigger.ManagedTypes.Lightweight;
 using Rigger.Attributes;
+using Rigger.Injection;
 
 namespace Rigger.ManagedTypes.Features
 {
@@ -12,7 +12,7 @@ namespace Rigger.ManagedTypes.Features
     {
         [Autowire]
         private IContainer _container;
-        public Services Services { get; set; }
+        public IServices Services { get; set; }
 
         public TRType Inject<TRType>(TRType objectToInjectTo)
         {

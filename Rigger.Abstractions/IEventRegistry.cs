@@ -5,7 +5,7 @@ namespace Rigger.ManagedTypes
 {
     public interface IEventRegistry
     {
-        IEnumerable<EventReceiver> Register(object instance);
+        IEnumerable<IEventReceiver> Register(object instance);
         void Fire(object eventToFire);
         Task FireAsync(object eventToFire);
     }

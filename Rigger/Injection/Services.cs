@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Rigger.Extensions;
+using Rigger.Injection.Defaults;
 using Rigger.Reflection;
-using Rigger.ManagedTypes.Lightweight.Defaults;
 
-namespace Rigger.ManagedTypes.Lightweight
+namespace Rigger.Injection
 {
     /// <summary>
     /// A lightweight IServiceProvider that will replace the ManagedTypeFactory within Rig
     /// </summary>
-    public class Services : IServiceProvider, IDisposable, IAsyncDisposable
+    public class Services : IServices, IServiceProvider, IDisposable, IAsyncDisposable
     {
         private readonly IDictionary<Type, ServiceDescription> _descriptionMap = new Dictionary<Type, ServiceDescription>();
         private readonly IDictionary<Type, IServiceInstance> _instanceMap = new Dictionary<Type, IServiceInstance>();
@@ -46,7 +46,7 @@ namespace Rigger.ManagedTypes.Lightweight
             }
         }
 
-        public Services Add(Type lookupType, Type concreteType, ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient)
+        public IServices Add(Type lookupType, Type concreteType, ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient)
         {
 
             if (_descriptionMap.ContainsKey(lookupType))
@@ -68,21 +68,21 @@ namespace Rigger.ManagedTypes.Lightweight
             return this;
         }
 
-        public Services Add<TLookupType>(Type concreteType, ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient)
+        public IServices Add<TLookupType>(Type concreteType, ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient)
         {
             Add(typeof(TLookupType), concreteType, serviceLifecycle);
 
             return this;
         }
 
-        public Services Add<TLookupType, TConcreteType>(ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient)
+        public IServices Add<TLookupType, TConcreteType>(ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient)
         {
             Add(typeof(TLookupType), typeof(TConcreteType), serviceLifecycle);
 
             return this;
         }
 
-        public Services Add(Type type, object instance)
+        public IServices Add(Type type, object instance)
         {
             _descriptionMap.Add(type, new ServiceDescription
             {
@@ -94,7 +94,7 @@ namespace Rigger.ManagedTypes.Lightweight
 
             return this;
         }
-        public Services Add(Type lookupType, Func<Services, Type, object> factory)
+        public IServices Add(Type lookupType, Func<IServices, Type, object> factory)
         {
             _descriptionMap.Add(lookupType, new ServiceDescription
             {
@@ -112,7 +112,7 @@ namespace Rigger.ManagedTypes.Lightweight
         /// <typeparam name="TLookupType"></typeparam>
         /// <param name="instance"></param>
         /// <returns></returns>
-        public Services Add<TLookupType>(object instance)
+        public IServices Add<TLookupType>(object instance)
         {
             Add(typeof(TLookupType), instance);
 
@@ -123,7 +123,7 @@ namespace Rigger.ManagedTypes.Lightweight
         {
             return _descriptionMap[type];
         }
-        public Services OfLifecycle(ServiceLifecycle serviceLifecycle)
+        public IServices OfLifecycle(ServiceLifecycle serviceLifecycle)
         {
             return new Services(_descriptionMap.Values.Where(i => i.LifeCycle == serviceLifecycle));
         }

@@ -12,14 +12,14 @@ using Rigger.Exceptions;
 using Rigger.ManagedTypes.ComponentHandlers;
 using Rigger.ManagedTypes.ComponentScanners;
 using Rigger.Attributes;
+using Rigger.Injection;
+using Rigger.ManagedTypes;
 using Rigger.ManagedTypes.Implementations;
 using Rigger.ManagedTypes.Implmentors;
-using Rigger.ManagedTypes.Lightweight;
 using Rigger.ManagedTypes.ServiceLocator;
 
-namespace Rigger.ManagedTypes
-{
-   /// <summary>
+namespace Rigger {
+    /// <summary>
    /// Top level class for an application container. The container will hold all of the
    /// managed types and manage their lifecycle as well as provide a component scanning
    /// functionality that will allow attributes to be used to manage objects.
@@ -31,20 +31,14 @@ namespace Rigger.ManagedTypes
     public class Rig : IContainer
    {
 
-       private static string PLUGIN_NAMESPACE = "Rigger";
+       private static string PLUGIN_NAMESPACE = "Rigger.Drone";
 
        private ILogger logger;
-       public Lightweight.Services Services { get; set; }
        public Assembly[] ScannedAssemblies { get; set; }
        public Type[] Ingots { get; protected set; }
 
        public bool IsValidated { get; protected set; }
-       public Services services { get; set; }
-
-       public object Get(Guid scopeId, Type lookupType, params object[] constructorParams)
-       {
-           throw new NotImplementedException();
-       }
+       public IServices Services { get; set; }
 
        public TInstance Get<TInstance>(params object[] constructorParams) where TInstance : class
        {
@@ -250,7 +244,7 @@ namespace Rigger.ManagedTypes
 
         public object GetService(Type serviceType)
         {
-            return Services.Get(serviceType);
+            return Services.GetService(serviceType);
         }
    }
 }
