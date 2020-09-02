@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rigger;
 using Rigger.Attributes;
@@ -29,7 +30,9 @@ namespace Drone.Bootstrap
                 .Add<IComponentScanner, ManagedComponentScanner>()
                 .Add(typeof(ILogger<>), typeof(Logger<>))
                 .Add<IConstructorActivator>(new ManagedConstructorInvoker())
-                .Add<IInstanceFactory>(new AutowireInstanceFactory());
+                .Add<IInstanceFactory>(new AutowireInstanceFactory())
+                .Add<IServiceProvider>(services)
+                .Add<IServiceScopeFactory>(services);
 
 
         }
