@@ -1,7 +1,7 @@
 ﻿using System;
-using TheCommons.Forge.ManagedTypes.Lightweight;
+using Rigger.ManagedTypes.Lightweight;
 
-namespace TheCommons.Forge.ManagedTypes.Implmentors
+namespace Rigger.ManagedTypes.Implmentors
 {
     /// <summary>
     /// DotNetCore DI Uses an implementation factory on its service descriptors. This is an IImplmentor

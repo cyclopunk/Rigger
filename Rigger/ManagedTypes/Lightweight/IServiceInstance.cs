@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheCommons.Forge.ManagedTypes.Lightweight
+namespace Rigger.ManagedTypes.Lightweight
 {
     public interface IServiceInstance : IDisposable
     {

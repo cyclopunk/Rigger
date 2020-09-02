@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
-using TheCommons.Forge.ManagedTypes.Implementations;
+using Rigger.ManagedTypes.Implementations;
 
-namespace TheCommons.Forge.ManagedTypes.ServiceLocator
+namespace Rigger.ManagedTypes.ServiceLocator
 {
     /// <summary>
     /// Implementor that uses a ThreadLocal

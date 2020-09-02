@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reflection;
-using TheCommons.Forge.ManagedTypes.Lightweight;
+using Rigger.ManagedTypes.Lightweight;
 
-namespace TheCommons.Forge.ManagedTypes.ComponentScanners
+namespace Rigger.ManagedTypes.ComponentScanners
 {
     /// <summary>
     /// The scanner interface is implemented on types that will provide assembly scanning and

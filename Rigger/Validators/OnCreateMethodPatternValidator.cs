@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
-using TheCommons.Forge.Exceptions;
+using Rigger.Exceptions;
 
-namespace TheCommons.Forge.Validators
+namespace Rigger.Validators
 {
     /// <summary>
     /// This validator makes sure that a method that is marked as OnCreate has no parameters.

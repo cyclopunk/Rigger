@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace TheCommons.Forge.ManagedTypes.Lightweight
+namespace Rigger.ManagedTypes.Lightweight
 {
     public class ServiceScope : IServiceProvider, IServiceScopeFactory, IServiceScope, IServiceAware
     {

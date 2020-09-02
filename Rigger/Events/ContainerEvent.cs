@@ -1,4 +1,4 @@
-﻿namespace TheCommons.Forge.Events
+﻿namespace Rigger.Events
 {
     public class ContainerEvent
     {

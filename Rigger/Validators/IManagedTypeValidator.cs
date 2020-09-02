@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheCommons.Forge.Validators
+namespace Rigger.Validators
 {
     public interface IManagedTypeValidator
     {

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Reflection;
-using TheCommons.Core.Configuration;
-using TheCommons.Core.Extensions;
-using TheCommons.Core.ValueConverters;
-using TheCommons.Forge.Exceptions;
-using TheCommons.Traits.Attributes;
+using Rigger.Configuration;
+using Rigger.Extensions;
+using Rigger.ValueConverters;
+using Rigger.Exceptions;
+using Rigger.Attributes;
 
-namespace TheCommons.Forge.ManagedTypes.Resolvers
+namespace Rigger.ManagedTypes.Resolvers
 {
     public class ConfigurationValueResolver : IValueResolver
     {

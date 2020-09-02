@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace TheCommons.Forge.ManagedTypes.Lightweight
+namespace Rigger.ManagedTypes.Lightweight
 {
     public class ServiceRegistry : IServiceScopeFactory, IServiceProvider
     {

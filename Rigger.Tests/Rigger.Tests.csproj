@@ -18,12 +18,14 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="NBuilder" Version="6.0.1" />
-    <PackageReference Include="xunit" Version="2.4.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TheCommons.Forge\TheCommons.Forge.csproj" />
+    <ProjectReference Include="..\Drone.Bootstrap\Drone.Bootstrap.csproj" />
+    <ProjectReference Include="..\Drone.Logging\Drone.Logging.csproj" />
+    <ProjectReference Include="..\Rigger\Rigger.csproj" />
   </ItemGroup>
 
 </Project>

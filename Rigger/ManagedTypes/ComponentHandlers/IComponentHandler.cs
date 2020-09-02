@@ -1,7 +1,7 @@
 ﻿using System;
-using TheCommons.Forge.ManagedTypes.Lightweight;
+using Rigger.ManagedTypes.Lightweight;
 
-namespace TheCommons.Forge.ManagedTypes.ComponentHandlers
+namespace Rigger.ManagedTypes.ComponentHandlers
 {
     /// <summary>
     /// Interface for a component handler that handles a type with a certain attribute.

@@ -1,4 +1,4 @@
-﻿namespace TheCommons.Forge.ManagedTypes.Implmentors
+﻿namespace Rigger.ManagedTypes.Implmentors
 {
     public interface IImplementor<TOpen>
     {

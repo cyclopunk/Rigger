@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheCommons.Forge.ManagedTypes.Lightweight.Defaults
+namespace Rigger.ManagedTypes.Lightweight.Defaults
 {
     public class DefaultServiceInstance : IServiceInstance, IServiceAware
     {

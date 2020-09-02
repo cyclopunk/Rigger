@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using TheCommons.Core.Extensions;
-using TheCommons.Core.Reflection;
-using TheCommons.Forge.Exceptions;
-using TheCommons.Forge.ManagedTypes.Lightweight;
-using TheCommons.Traits.Attributes;
+using Rigger.Extensions;
+using Rigger.Reflection;
+using Rigger.Exceptions;
+using Rigger.ManagedTypes.Lightweight;
+using Rigger.Attributes;
 
-namespace TheCommons.Forge.ManagedTypes
+namespace Rigger.ManagedTypes
 {
     /// <summary>
     /// Class with helper methods for loading Ingots.

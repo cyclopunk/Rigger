@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheCommons.Forge.Exceptions
+namespace Rigger.Exceptions
 {
     public class MethodValidationException : Exception
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheCommons.Forge.Events
+namespace Rigger.Events
 {
     public class IngotLoadedEvent : ContainerEvent
     {

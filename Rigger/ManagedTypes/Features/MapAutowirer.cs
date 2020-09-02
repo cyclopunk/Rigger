@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using TheCommons.Core.Extensions;
-using TheCommons.Forge.Exceptions;
-using TheCommons.Traits.Attributes;
+using Rigger.Extensions;
+using Rigger.Exceptions;
+using Rigger.Attributes;
 
-namespace TheCommons.Forge.ManagedTypes.Features
+namespace Rigger.ManagedTypes.Features
 {
     /// <summary>
     /// A simple autowirer that uses a map to inject instances into

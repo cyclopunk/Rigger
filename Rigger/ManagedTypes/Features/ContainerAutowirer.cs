@@ -1,9 +1,9 @@
-﻿using TheCommons.Core.Extensions;
-using TheCommons.Forge.Exceptions;
-using TheCommons.Forge.ManagedTypes.Lightweight;
-using TheCommons.Traits.Attributes;
+﻿using Rigger.Extensions;
+using Rigger.Exceptions;
+using Rigger.ManagedTypes.Lightweight;
+using Rigger.Attributes;
 
-namespace TheCommons.Forge.ManagedTypes.Features
+namespace Rigger.ManagedTypes.Features
 {
     /// <summary>
     /// Class that will preform autowiring by iterating through fields and properties and finding the [Autowire] attribute

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace TheCommons.Forge.ManagedTypes.Lightweight
+namespace Rigger.ManagedTypes.Lightweight
 {
     public static class ServiceDescriptionExtensions
     {

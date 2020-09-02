@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace TheCommons.Forge.ManagedTypes.Features
+namespace Rigger.ManagedTypes.Features
 {
     /// <summary>
     /// A Dictionary that will always return a value for any key passed

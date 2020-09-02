@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TheCommons.Core.Extensions;
-using TheCommons.Core.Reflection;
-using TheCommons.Forge.ManagedTypes.Lightweight.Defaults;
+using Rigger.Extensions;
+using Rigger.Reflection;
+using Rigger.ManagedTypes.Lightweight.Defaults;
 
-namespace TheCommons.Forge.ManagedTypes.Lightweight
+namespace Rigger.ManagedTypes.Lightweight
 {
     /// <summary>
-    /// A lightweight IServiceProvider that will replace the ManagedTypeFactory within Crucible
+    /// A lightweight IServiceProvider that will replace the ManagedTypeFactory within Rig
     /// </summary>
     public class Services : IServiceProvider, IDisposable, IAsyncDisposable
     {

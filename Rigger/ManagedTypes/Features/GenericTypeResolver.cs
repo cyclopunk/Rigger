@@ -1,7 +1,7 @@
 ﻿using System;
-using TheCommons.Forge.ManagedTypes.Resolvers;
+using Rigger.ManagedTypes.Resolvers;
 
-namespace TheCommons.Forge.ManagedTypes.Features
+namespace Rigger.ManagedTypes.Features
 {
     public class GenericTypeResolver : ITypeResolver
     {

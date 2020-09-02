@@ -1,7 +1,7 @@
 ﻿using System;
-using TheCommons.Forge.ManagedTypes.Features;
+using Rigger.ManagedTypes.Features;
 
-namespace TheCommons.Forge.ManagedTypes.Lightweight
+namespace Rigger.ManagedTypes.Lightweight
 {
     public class AutowireInstanceFactory : IInstanceFactory, IServiceAware
     {
