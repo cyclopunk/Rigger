@@ -38,7 +38,7 @@ jobs:
     - name: Nuget Source
       run: nuget sources add -Name "GPR" -Source "https://nuget.pkg.github.com/cyclopunk/index.json" -UserName "cyclopunk" -Password "${{ secrets.API_KEY  }}"
     - name: Nuget Publish
-      run: nuget push *.nupkg -Source "GPR" -SkipDuplicate -ApiKey ${{ secrets.API_KEY  }}
+      run: nuget push **\*.nupkg -Source "GPR" -SkipDuplicate -ApiKey ${{ secrets.API_KEY  }}
       
       
     
