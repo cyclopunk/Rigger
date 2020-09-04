@@ -24,7 +24,8 @@ namespace Drone.Bootstrap
     {
         public DefaultModule(Services services)
         {
-            services.Add(typeof(ILoggerFactory), typeof(ConsoleLogger))
+            services
+                .Add(typeof(ILoggerFactory), typeof(ConsoleLogger))
                 .Add<IAutowirer, ContainerAutowirer>() // add autowiring
                 .Add<IConstructorActivator,ManagedConstructorInvoker>() // faster activator
                 .Add<IInstanceFactory,AutowireInstanceFactory>() // factory that will create autowired instances

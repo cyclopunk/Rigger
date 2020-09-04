@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Rigger.Extensions;
 using Rigger.Exceptions;
 using Rigger.Attributes;
 using Rigger.Injection;
+using Rigger.Reflection;
 
 namespace Rigger.ManagedTypes.Features
 {
@@ -11,40 +14,42 @@ namespace Rigger.ManagedTypes.Features
     /// </summary>
     public class ContainerAutowirer : IAutowirer, IServiceAware
     {
+        private static IDictionary<Type, List<ExpressionPropertyAccessor>> _cache =
+            new ConcurrentDictionary<Type, List<ExpressionPropertyAccessor>>(); 
+        private static IDictionary<Type, List<ExpressionFieldAccessor>> _fieldCache =
+            new ConcurrentDictionary<Type, List<ExpressionFieldAccessor>>();
         public IServices Services { get; set; }
 
-        public TRType Inject<TRType>(TRType objectToInjectTo)
+        public void CacheType(Type type)
         {
-            if (objectToInjectTo == null) throw new ArgumentNullException(nameof(objectToInjectTo));
-            // inject into properties
-            objectToInjectTo.GetType().PropertyWithAttribute<AutowireAttribute>().ForEach(property =>
+            var propList = _cache.GetOrPut(type, () => new List<ExpressionPropertyAccessor>());
+            var fieldList = _fieldCache.GetOrPut(type, () => new List<ExpressionFieldAccessor>());
+            type.PropertyWithAttribute<AutowireAttribute>().ForEach(property =>
             {
-                // get an instance of the type that is being autowired.
-                var instance = Services.GetService(property.PropertyType);
-
-                if (instance == null)
-                {
-                    throw new ManagedTypeNotRegisteredException($"Cannot autowire {property.Name} on {typeof(TRType)}. Managed type {property.PropertyType} not registered in the container.");
-                }
-
-                property.SetValue(objectToInjectTo, instance);
+                propList.Add(new ExpressionPropertyAccessor(property));
             });
 
             // inject into fields
-            objectToInjectTo
-                .GetType()
-                .FieldsWithAttribute<AutowireAttribute>()
+            type.FieldsWithAttribute<AutowireAttribute>()
                 .ForEach(field =>
                 {
-                    var instance = Services.GetService(field.FieldType);
-
-                    if (instance == null)
-                    {
-                        throw new ManagedTypeNotRegisteredException($"Cannot autowire {field.Name} on {typeof(TRType)}.Managed type {field.FieldType} not registered in the container.");
-                    }
-
-                    field.SetValue(objectToInjectTo, instance);
+                    var list = _fieldCache.GetOrPut(type, () => new List<ExpressionFieldAccessor>());
+                    fieldList.Add(new ExpressionFieldAccessor(field));
                 });
+        }
+        public TRType Inject<TRType>(TRType objectToInjectTo)
+        {
+            Type type = objectToInjectTo.GetType();
+
+            if (objectToInjectTo == null) throw new ArgumentNullException(nameof(objectToInjectTo));
+
+            if (!_cache.ContainsKey(type))
+            {
+                CacheType(type);
+            }
+
+            _cache[type].ForEach(o => o.SetValue(objectToInjectTo,Services.GetService(o.PropertyType)));
+            _fieldCache[type].ForEach(o => o.SetValue(objectToInjectTo, Services.GetService(o.FieldType)));
 
             return objectToInjectTo;
         }
