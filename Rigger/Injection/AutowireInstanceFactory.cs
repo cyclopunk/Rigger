@@ -4,21 +4,40 @@ using Rigger.Reflection;
 
 namespace Rigger.Injection
 {
+    /// <summary>
+    /// This instance factory will autowire all instances that it creates.
+    /// </summary>
     public class AutowireInstanceFactory : IInstanceFactory, IServiceAware
     {
         public IServices Services { get; set; }
 
         public object Make(Type type)
         {
+            object instance;
+
+            if (typeof(IConstructorActivator).IsAssignableFrom (type))
+            {
+                instance = Activator.CreateInstance(type, new object[] { });
+
+                if (instance is IServiceAware i) i.AddServices(Services); 
+
+                return instance;
+            }
+
             IConstructorActivator invoker = Services.GetService<IConstructorActivator>();
+
+            // loop protection
+            if (typeof(IAutowirer).IsAssignableFrom (type))
+            {
+                instance = invoker?.Construct(type, new object[] { });
+                if (instance is IServiceAware i) i.AddServices(Services);
+
+                return instance;
+            }
+
             IAutowirer autowire = Services.GetService<IAutowirer>();
 
-            var instance = invoker?.Construct(type, new object[] {});
-
-            if (instance is IServiceAware i)
-            {
-                i.Services = Services;
-            }
+            instance = invoker?.Construct(type, new object[] {});
 
             autowire?.Inject(instance);
 

@@ -9,9 +9,10 @@ namespace Rigger.Injection
     /// </summary>
     public class ThreadServiceInstance : IServiceInstance, IServiceAware
     {
-        private volatile ManagedConstructorInvoker _invoker; 
         private ThreadLocal<object> _threadLocalFactory;
         public IServices Services { get; set; }
+        public Type LookupType { get; set; }
+        public Type ServiceType { get; set; }
         public Type InstanceType { get; set; }
 
         public object Instance => _threadLocalFactory.Value;
@@ -33,7 +34,6 @@ namespace Rigger.Injection
         public void Dispose()
         {
             _threadLocalFactory?.Dispose();
-            _invoker = null;
         }
     }
 }

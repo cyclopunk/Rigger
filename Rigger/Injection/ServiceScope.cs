@@ -3,6 +3,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Rigger.Injection
 {
+    public class ServiceScopeFactory : IServiceScopeFactory, IServiceAware
+    {
+        public IServices Services { get; set; }
+        public IServiceScope CreateScope()
+        {
+            return new ServiceScope().AddServices(Services);
+        }
+    }
     public class ServiceScope : IServiceProvider, IServiceScopeFactory, IServiceScope, IServiceAware
     {
         private IServices services;
@@ -19,37 +27,28 @@ namespace Rigger.Injection
             this.parent = parent;
         }
 
-        public IServiceProvider ServiceProvider => parent;
+        public IServiceProvider ServiceProvider => Services;
 
         public IServices Services
         {
             get => services; 
-            set => services = value;
+            set => services = value.OfLifecycle(ServiceLifecycle.Singleton, ServiceLifecycle.Scoped);
         }
 
         public IServiceScope CreateScope()
         {
-            return new ServiceScope(this);
+            return new ServiceScope(this).AddServices(services);
         }
 
         public void Dispose()
         {
-            services.Dispose();
+            services.DisposeScope();
         }
 
         public object GetService(Type serviceType)
         {
 
             var service = services.GetService(serviceType);
-            
-            if (service == null)
-            {
-                service = parent.GetService(serviceType);
-                if (service != null)
-                {
-                    services.Add(serviceType, service.GetType());
-                }
-            }
 
             return service;
         }

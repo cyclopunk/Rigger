@@ -11,6 +11,8 @@ namespace Rigger.Injection.Defaults
         }
 
         public IServices Services { get; set; }
+        public Type LookupType { get; set; }
+        public Type ServiceType { get; set; }
         public Type InstanceType { get; set; }
     }
 }

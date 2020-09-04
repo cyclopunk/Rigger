@@ -19,19 +19,29 @@ namespace Rigger.ManagedTypes
     public class EventRegistry : IEventRegistry, IServiceAware
     {
         public IServices Services { get; set; }
-        
+
         /// <summary>
         /// Thread-safe storage of instance event registration.
         /// TODO registration maintenance
         /// </summary>
-        private readonly ConcurrentBag<IEventReceiver> _eventRegistry = new ConcurrentBag<IEventReceiver>();
+        private readonly ConcurrentDictionary<object, List<IEventReceiver>> _eventRegistry =
+            new ConcurrentDictionary<object, List<IEventReceiver>>();
+        private readonly ConcurrentDictionary<Type, List<IEventReceiver>> _typeCache = 
+            new ConcurrentDictionary<Type, List<IEventReceiver>>();
+
         public IEnumerable<IEventReceiver> Register(object instance)
         {
+            if (_eventRegistry.ContainsKey(instance))
+            {
+                return null;
+            }
 
             var methods = instance.GetType().MethodsWithAttribute<OnEventAttribute>();
 
             var registrations = methods.Map(o =>
             {
+                _eventRegistry.GetOrPut(instance, () => new List<IEventReceiver>());
+
                 OnEventAttribute attr = o.GetCustomAttribute<OnEventAttribute>();
 
                 var registration = new EventReceiver
@@ -41,7 +51,8 @@ namespace Rigger.ManagedTypes
                     Invoker = new ManagedMethodInvoker(instance.GetType(), o.Name)
                 };
 
-                _eventRegistry.Add(registration);
+                _eventRegistry[instance].Add(registration);
+                _typeCache[attr.Event].Add(registration);
 
                 return registration;
             });
@@ -53,21 +64,25 @@ namespace Rigger.ManagedTypes
         /// </summary>
         public void Fire(object eventToFire)
         {
-            _eventRegistry.ToList().FindAll(f =>
-                {
-                    var etype = f.EventType;
-                    var ftype = eventToFire.GetType();
+            if (!_typeCache.ContainsKey(eventToFire.GetType()))
+            {
+                return;
+            }
 
-                    return f.EventType.IsAssignableFrom(eventToFire.GetType());
-                })
-                .ForEach(o =>
-                {
-                    o.Invoker.Invoke(o.Receiver, eventToFire);
-                });
+            _typeCache[eventToFire.GetType()].ToList().FindAll(f =>
+            {
+                var etype = f.EventType;
+                var ftype = eventToFire.GetType();
+
+                return etype.IsAssignableFrom(ftype);
+            }).ForEach(o =>
+            {
+                o.Invoker.Invoke(o.Receiver, eventToFire);
+            });
         }
         public async Task FireAsync(object eventToFire)
         {
-            var tasks = _eventRegistry.ToList().FindAll(f => f.EventType == eventToFire.GetType())
+            var tasks = _typeCache[eventToFire.GetType()].ToList().FindAll(f => f.EventType == eventToFire.GetType())
                 .Map(o => Task.Run( () => o?.Invoker?.Invoke(o.Receiver, eventToFire)));
 
             await Task.WhenAll(tasks);
