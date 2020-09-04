@@ -26,6 +26,13 @@ namespace Rigger.Tests {
    public class SingletonService : ISingletonService
    {
        [Autowire] public ILogger<SingletonService> logger;
+
+       public bool OnCreateCalled { get; set; }
+       [OnCreate]
+       public void TestOnCreate()
+       {
+           OnCreateCalled = true;
+       }
    }
     public class TransientService
     {
@@ -189,8 +196,10 @@ namespace Rigger.Tests {
             aw.Should().BeAssignableTo<AutoWireService>();
 
             aw.service.Should().BeAssignableTo<ISingletonService>();
+
                 
             ((SingletonService) aw.service).logger.Should().BeAssignableTo<Logger<SingletonService>>();
+            ((SingletonService) aw.service).OnCreateCalled.Should().BeTrue();
         }
 
         [Fact]

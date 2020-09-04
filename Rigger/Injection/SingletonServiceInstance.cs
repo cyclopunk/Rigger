@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Rigger.Attributes;
+using Rigger.Extensions;
+using Rigger.Reflection;
 
 namespace Rigger.Injection
 {
@@ -10,6 +14,7 @@ namespace Rigger.Injection
 
     public class SingletonServiceInstance : IServiceInstance, IServiceAware
     {
+        private List<ZeroParameterMethodAccessor> _cache;
         public Type ServiceType { get; set; }
         public Type InstanceType { get; set; }
         public IServices Services { get; set; }
@@ -31,6 +36,7 @@ namespace Rigger.Injection
         {
             get
             {
+
                 if (_instanceInternal == null)
                 {
                     var instanceFactory = Services.GetService<IInstanceFactory>();
@@ -42,7 +48,13 @@ namespace Rigger.Injection
                     }
 
                     _instanceInternal ??= instanceFactory?.Make(InstanceType) ?? (InstanceType.HasServiceConstructor() ? Activator.CreateInstance(InstanceType, Services) : Activator.CreateInstance(InstanceType));
-
+                    
+                    InstanceType
+                        .MethodsWithAttribute(typeof(OnCreateAttribute)).ForEach(o =>
+                        {
+                            new ZeroParameterMethodAccessor(o).Invoke(_instanceInternal);
+                        });
+                    
                     return _instanceInternal;
                 }
                 

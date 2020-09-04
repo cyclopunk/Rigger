@@ -206,7 +206,7 @@ namespace Rigger {
         public object GetService(Type serviceType)
         {
             var instance = Services.GetService(serviceType);
-            
+
             Services.GetService<IEventRegistry>()?.Register(instance);
 
             return instance;
