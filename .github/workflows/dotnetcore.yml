@@ -29,13 +29,13 @@ jobs:
     - name: Setup NuGet.exe for use with actions
       uses: NuGet/setup-nuget@v1.0.2
       with:
-        nuget-api-key: ${{ secrets.API_KEY }}
+        nuget-api-key: ${{ secrets.GITHUB_TOKEN }}
     - name: Nuget Pack
       run: dotnet pack --configuration Release -p:PackageVersion=${{ steps.gitversion.outputs.SemVer }}
     - name: Nuget Source
-      run: nuget sources add -Name "GPR" -Source "https://nuget.pkg.github.com/cyclopunk/index.json" -UserName "cyclopunk" -Password "${{ secrets.API_KEY  }}"
+      run: nuget sources add -Name "GPR" -Source "https://nuget.pkg.github.com/cyclopunk/index.json" -UserName "cyclopunk" -Password "${{ secrets.GITHUB_TOKEN  }}"
     - name: Nuget Publish
-      run: nuget push **\*.nupkg -Source "GPR" -SkipDuplicate -ApiKey ${{ secrets.API_KEY  }}
+      run: nuget push **\*.nupkg -Source "GPR" -SkipDuplicate 
       
       
     
