@@ -7,11 +7,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rigger", "Rigger\Rigger.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rigger.Tests", "Rigger.Tests\Rigger.Tests.csproj", "{E660F7F9-6C04-4E84-A280-6BCE7DCE1566}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drone.Logging", "Drone.Logging\Drone.Logging.csproj", "{0D8102C5-58DE-417C-B59C-D0799664C88E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Drone.Logging", "Drone.Logging\Drone.Logging.csproj", "{0D8102C5-58DE-417C-B59C-D0799664C88E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drone.Bootstrap", "Drone.Bootstrap\Drone.Bootstrap.csproj", "{3302061E-2F32-4A0B-9F5B-BA0E4FFF1F3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Drone.Bootstrap", "Drone.Bootstrap\Drone.Bootstrap.csproj", "{3302061E-2F32-4A0B-9F5B-BA0E4FFF1F3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rigger.Abstractions", "Rigger.Abstractions\Rigger.Abstractions.csproj", "{8DFB8AAF-C922-4B8C-B7FE-6525F9EAAAC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rigger.Abstractions", "Rigger.Abstractions\Rigger.Abstractions.csproj", "{8DFB8AAF-C922-4B8C-B7FE-6525F9EAAAC0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3966D51A-901A-4AD5-93BE-697904DA8238}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
+		README.md = README.md
+		.github\workflows\runtests.yml = .github\workflows\runtests.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -26,6 +26,13 @@ namespace Rigger.Tests {
    public class SingletonService : ISingletonService
    {
        [Autowire] public ILogger<SingletonService> logger;
+
+       public bool OnCreateCalled { get; set; }
+       [OnCreate]
+       public void TestOnCreate()
+       {
+           OnCreateCalled = true;
+       }
    }
     public class TransientService
     {
@@ -81,10 +88,10 @@ namespace Rigger.Tests {
     {
         public bool IsTrue { get; set; }
     } 
-    public class LightweightServiceTests
+    public class InjectionTests
     {
         private readonly ITestOutputHelper output;
-        public LightweightServiceTests(ITestOutputHelper output)
+        public InjectionTests(ITestOutputHelper output)
         {
             this.output = output;
         }
@@ -189,8 +196,10 @@ namespace Rigger.Tests {
             aw.Should().BeAssignableTo<AutoWireService>();
 
             aw.service.Should().BeAssignableTo<ISingletonService>();
+
                 
             ((SingletonService) aw.service).logger.Should().BeAssignableTo<Logger<SingletonService>>();
+            ((SingletonService) aw.service).OnCreateCalled.Should().BeTrue();
         }
 
         [Fact]
@@ -227,7 +236,7 @@ namespace Rigger.Tests {
             {
                 services.GetService<IOption<AnotherOption>>();
             }
-            var logger = services.GetService<ILoggerFactory>().CreateLogger<LightweightServiceTests>();
+            var logger = services.GetService<ILoggerFactory>().CreateLogger<InjectionTests>();
 
             sw.Stop();
             logger.LogInformation("Time to make 100k non-autowired objects: " + sw.ElapsedMilliseconds + "ms");

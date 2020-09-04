@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <PackageVersion>0.1.1</PackageVersion>
     <Version>0.1.0</Version>
     <RepositoryUrl>https://github.com/cyclopunk/Rigger</RepositoryUrl>
   </PropertyGroup>

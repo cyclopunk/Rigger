@@ -1,9 +1,15 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Rigger.Injection
 {
     public static class ServiceDescriptionExtensions
     {
+
+        public static bool HasServiceConstructor(this Type type)
+        {
+            return type.GetConstructor(new Type[] { typeof(IServices) }) != null;
+        }
         /// <summary>
         /// Check to see if a service description is the same as another service description.
         /// </summary>

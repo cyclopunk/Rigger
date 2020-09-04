@@ -7,7 +7,7 @@ using Rigger.Attributes;
 
 namespace Rigger.Utility
 {
-    [Managed]
+    [Managed(typeof(Profiler))]
     public class Profiler : IDisposable
     {
 
@@ -19,6 +19,11 @@ namespace Rigger.Utility
         public long TotalTime { get; } = 0L;
         
         private long _lastTrack;
+
+        public Profiler()
+        {
+            this.Name = "General Profiler";
+        }
         public Profiler(string name)
         {
             this.Name = name;

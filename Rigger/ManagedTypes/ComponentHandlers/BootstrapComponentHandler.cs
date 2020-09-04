@@ -11,12 +11,12 @@ namespace Rigger.ManagedTypes.ComponentHandlers
 
         public void HandleComponent(Type type)
         {
-            /*var typeRegistration = typeRegistry.Register(RegistrationType.Singleton, type);
+            Services.Add(type, type, ServiceLifecycle.Singleton);
 
-            var instance = container.Get(type);
+            Services.GetService(type); // make an instance
 
-            typeRegistration.ImplementationType.Manager.InvokeAttributeMethods<OnCreateAttribute>(instance);
-            typeRegistration.ImplementationType.Manager.InvokeAttributeMethods<OnStartupAttribute>(instance);*/
+            //typeRegistration.ImplementationType.Manager.InvokeAttributeMethods<OnCreateAttribute>(instance);
+            //typeRegistration.ImplementationType.Manager.InvokeAttributeMethods<OnStartupAttribute>(instance);
         }
     }
 }

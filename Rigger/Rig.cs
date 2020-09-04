@@ -43,12 +43,16 @@ namespace Rigger {
        {
            Services.Add(type, instance);
 
+           Services.GetService<IEventRegistry>()?.Register(instance);
+
            return this;
        }
 
        public IContainer Register<TType>(object instance)
        {
            Services.Add<TType>(instance);
+
+           Services.GetService<IEventRegistry>()?.Register(instance);
 
            return this;
        }
@@ -201,7 +205,11 @@ namespace Rigger {
 
         public object GetService(Type serviceType)
         {
-            return Services.GetService(serviceType);
+            var instance = Services.GetService(serviceType);
+
+            Services.GetService<IEventRegistry>()?.Register(instance);
+
+            return instance;
         }
    }
 }

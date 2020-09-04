@@ -18,7 +18,6 @@ namespace Rigger.ManagedTypes.ComponentScanners
     public class BootstrapComponentScanner : IComponentScanner
     {
         public IServices Services { get; set; }
-        [Autowire] private IContainer Container { get; set; }
         [Autowire] private IComponentHandler<BootstrapAttribute> Handler { get; set; }
 
         public IEnumerable<Type> ComponentScan(params Assembly[] assemblies)

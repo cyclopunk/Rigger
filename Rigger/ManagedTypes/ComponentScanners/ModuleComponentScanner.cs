@@ -21,7 +21,7 @@ namespace Rigger.ManagedTypes.ComponentScanners
 
         [Autowire] private ILogger<ModuleComponentScanner> _logger;
 
-        public ModuleComponentScanner(Services services)
+        public ModuleComponentScanner(IServices services)
         {
             this.Services = services;
         }

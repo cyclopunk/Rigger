@@ -11,7 +11,7 @@ namespace Rigger.Injection
     /// <summary>
     /// A lightweight IServiceProvider that will replace the ManagedTypeFactory within Rig
     /// </summary>
-    public class Services : IServices, IServiceProvider, IDisposable, IAsyncDisposable
+    public class Services : IServices
     {
         private readonly IDictionary<Type, ServiceDescription> _descriptionMap = new Dictionary<Type, ServiceDescription>();
         private readonly IDictionary<Type, IServiceInstance> _instanceMap = new Dictionary<Type, IServiceInstance>();
@@ -42,7 +42,11 @@ namespace Rigger.Injection
             }
             foreach (var d in instances)
             {
-                _instanceMap[d.InstanceType] = d;
+                Type st = _descriptionMap
+                    .FirstOrDefault(kvp => kvp.Value.ImplementationType == d.InstanceType)
+                    .Value?.ServiceType;
+                if (st != null)
+                    _instanceMap[st] = d;
             }
         }
 
@@ -90,19 +94,26 @@ namespace Rigger.Injection
                 ImplementationType = instance.GetType(),
                 LifeCycle = ServiceLifecycle.Singleton
             });
-            _instanceMap.Add(type, new SingletonServiceInstance(instance).AddServices(this));
+            _instanceMap.Add(type, new SingletonServiceInstance(instance) { LookupType = type, ServiceType = type}.AddServices(this));
 
             return this;
         }
-        public IServices Add(Type lookupType, Func<IServices, Type, object> factory)
+        /// <summary>
+        /// Add a service factory
+        /// </summary>
+        /// <param name="lookupType">The abstract service type</param>
+        /// <param name="factory">A factory that will create instances of the object</param>
+        /// <param name="lifecycle">The lifecycle of the object, defaults to singleton</param>
+        /// <returns></returns>
+        public IServices Add(Type lookupType, Func<IServices, object> factory, ServiceLifecycle lifecycle = ServiceLifecycle.Singleton)
         {
             _descriptionMap.Add(lookupType, new ServiceDescription
             {
                 ServiceType = lookupType,
-                ImplementationType = typeof(Func<Type, object>),
+                ImplementationType = lookupType,
                 Factory = factory,
-                LifeCycle = ServiceLifecycle.Singleton
-            });
+                LifeCycle = lifecycle
+            });;
 
             return this;
         }
@@ -119,13 +130,36 @@ namespace Rigger.Injection
             return this;
         }
 
+        public IServices Remove<TLookupType>()
+        {
+            _descriptionMap.Remove(typeof(TLookupType));
+            _instanceMap.Remove(typeof(TLookupType));
+
+            return this;
+        }
+        public IServices Remove(Type type)
+        {
+            _descriptionMap.Remove(type);
+            _instanceMap.Remove(type);
+
+            return this;
+        }
+
         public ServiceDescription GetDescription(Type type)
         {
             return _descriptionMap[type];
         }
-        public IServices OfLifecycle(ServiceLifecycle serviceLifecycle)
+        // create a new service provider with specified instances of the lifecycles specified.
+        // TODO this will probably be slow, fix it.
+        public IServices OfLifecycle(params ServiceLifecycle[] serviceLifecycle)
         {
-            return new Services(_descriptionMap.Values.Where(i => i.LifeCycle == serviceLifecycle));
+            var descriptions = _descriptionMap.Values.Where(o => serviceLifecycle.Contains(o.LifeCycle)).ToList();
+
+            var instances = _instanceMap.Where(kvp => descriptions
+                    .Any(o => o.ServiceType == kvp.Value.ServiceType))
+                    .Select(s => s.Value);
+
+            return new Services(_descriptionMap.Values, instances);
         }
         public ValueTask DisposeAsync()
         {
@@ -158,20 +192,24 @@ namespace Rigger.Injection
             return (T) GetService(typeof(T));
         }
 
+   
         /// <summary>
-        /// TODO Add thread type
+        /// Get the service instance for a description
         /// </summary>
-        /// <param name="desc"></param>
+        /// <param name="description"></param>
+        /// <param name="lookupType"></param>
         /// <returns></returns>
-        internal IServiceInstance GetServiceInstance(ServiceLifecycle lifecycle, Type implType)
+        internal IServiceInstance GetServiceInstance(ServiceDescription description, Type lookupType, Type overrideImplType=null)
         {
-            return lifecycle switch
+            return description.LifeCycle switch
             {
                 ServiceLifecycle.Singleton => new SingletonServiceInstance
-                    {InstanceType = implType}.AddServices(this),
+                    {InstanceType = overrideImplType ?? description.ImplementationType, LookupType = lookupType, ServiceType = description.ServiceType}.AddServices(this),
+                ServiceLifecycle.Scoped => new ScopedServiceInstance
+                    {InstanceType = overrideImplType ?? description.ImplementationType, LookupType = lookupType, ServiceType = description.ServiceType}.AddServices(this),
                 ServiceLifecycle.Thread =>new ThreadServiceInstance
-                    {InstanceType = implType}.AddServices(this),
-                _ => new DefaultServiceInstance {InstanceType = implType}.AddServices(this)
+                    {InstanceType = description.ImplementationType, LookupType = lookupType, ServiceType = description.ServiceType}.AddServices(this),
+                _ => new DefaultServiceInstance {InstanceType = overrideImplType ?? description.ImplementationType, LookupType = lookupType, ServiceType = description.ServiceType}.AddServices(this)
             };
         }
 
@@ -200,7 +238,7 @@ namespace Rigger.Injection
             desc?.AllTypes()?.ForEach(o =>
             {
                 // create an instance activator for all types if one doesn't exist
-                var instance = _instanceMap.GetOrPut(o, () => GetServiceInstance(desc.LifeCycle, o));
+                var instance = _instanceMap.GetOrPut(o, () => GetServiceInstance(desc, o, o));
                 
                 // add it to the list using the method accessor
 
@@ -237,15 +275,6 @@ namespace Rigger.Injection
 
                     if (openType != null)
                     {
-                        if (openType.Factory != null)
-                        {
-                            var instance = openType.Factory(this, serviceType.GetGenericArguments().First());
-                            
-                            Add(serviceType, instance);
-
-                            return instance;
-                        }
-
                         var makeType = openType.ImplementationType.MakeGenericType(serviceType.GetGenericArguments());
 
                         // cache constructed type
@@ -265,15 +294,24 @@ namespace Rigger.Injection
                 if (desc != null)
                 {
                     if (desc.Factory != null)
-                        return desc.Factory(this, serviceType.GetGenericArguments().First());
+                        return desc.Factory(this);
 
-                    IServiceInstance instance = GetServiceInstance(desc.LifeCycle, desc.ImplementationType);
+                    IServiceInstance instance = GetServiceInstance(desc,serviceType);
 
                     _instanceMap.Add(serviceType, instance);
 
-                    return instance.Get();
+                    var newInstance = instance.Get();
+                    if (newInstance is IServiceAware svc && svc.Services == null)
+                    {
+                        svc.AddServices(this);
+                    }
+
+
+                    return newInstance;
                 }
             }
+
+            // has an instance already.
 
             var i = service?.Get();
 
@@ -286,6 +324,32 @@ namespace Rigger.Injection
             return  i;
         }
 
+        /// <summary>
+        /// Replace a service 
+        /// </summary>
+        /// <typeparam name="T">The service to replace</typeparam>
+        /// <typeparam name="R">The concrete type of the service</typeparam>
+        public IServices Replace<T, R>() where R : T
+        {
+            if (_descriptionMap.ContainsKey(typeof(T)))
+            {
+                Remove<T>();
+            }
+            Add<T, R>();
+
+            return this;
+        }
+        public IServices Replace<T, R>(R instance) where R : T
+        {
+            if (_descriptionMap.ContainsKey(typeof(T)))
+            {
+                Remove<T>();
+            }
+
+            Add<T>(instance);
+
+            return this;
+        }
         public void Dispose()
         {
             if (!_disposedValue)
@@ -294,9 +358,14 @@ namespace Rigger.Injection
 
                 _instanceMap.Values.ForEach(i =>
                 {
-                    if (i is IDisposable d)
+                    // the instance map may hold a reference to this object
+                    // ignore it if it does.
+                    if (i.Get() != this)
                     {
-                        d.Dispose();
+                        if (i is IDisposable d)
+                        {
+                            d.Dispose();
+                        }
                     }
                 });
 
@@ -304,6 +373,25 @@ namespace Rigger.Injection
 
                 _disposedValue = true;
             }
+        }
+
+        public void DisposeScope()
+        {
+            _instanceMap.Values.ForEach(i =>
+            {
+                // the instance map may hold a reference to this object
+                // ignore it if it does.
+                if (i.Get() != this)
+                {
+                    if (i is ScopedServiceInstance d)
+                    {
+                        d.Dispose();
+                    }
+                }
+            });
+            _disposedValue = true;
+            _descriptionMap.Clear();
+            _instanceMap.Clear();
         }
 
     }

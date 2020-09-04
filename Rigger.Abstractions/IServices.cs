@@ -11,7 +11,8 @@ namespace Rigger.Injection
     public interface IServices : IServiceProvider, IDisposable, IAsyncDisposable
     {
         IEnumerable<ValidationError> Validate();
-
+        IServices Replace<T, R>() where R : T;
+        IServices Replace<T,R>(R instance) where R : T;
         IServices Add(Type lookupType, Type concreteType,
             ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient);
 
@@ -20,7 +21,7 @@ namespace Rigger.Injection
         IServices Add<TLookupType, TConcreteType>(ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient);
 
         IServices Add(Type type, object instance);
-        public IServices Add(Type lookupType, Func<IServices, Type, object> factory);
+        public IServices Add(Type lookupType, Func<IServices, object> factory, ServiceLifecycle serviceLifecycle = ServiceLifecycle.Singleton);
 
         /// <summary>
         /// Add a singleton instance.
@@ -31,7 +32,7 @@ namespace Rigger.Injection
         public IServices Add<TLookupType>(object instance);
 
 
-        public IServices OfLifecycle(ServiceLifecycle serviceLifecycle);
+        public IServices OfLifecycle(params ServiceLifecycle[] serviceLifecycle);
 
         /// <summary>
         /// Get a service that is registered as the type provided
@@ -43,6 +44,8 @@ namespace Rigger.Injection
         {
             return (T) GetService(typeof(T));
         }
+
+        public void DisposeScope();
 
     }
 }

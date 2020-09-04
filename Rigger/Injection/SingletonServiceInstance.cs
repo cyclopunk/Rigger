@@ -1,10 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using Rigger.Attributes;
+using Rigger.Extensions;
+using Rigger.Reflection;
 
 namespace Rigger.Injection
 {
+    public class ScopedServiceInstance : SingletonServiceInstance
+    {
+
+    }
+
     public class SingletonServiceInstance : IServiceInstance, IServiceAware
     {
+        private List<ZeroParameterMethodAccessor> _cache;
+        public Type ServiceType { get; set; }
         public Type InstanceType { get; set; }
+        public IServices Services { get; set; }
+        public Type LookupType { get; set; }
 
         private object _instanceInternal;
 
@@ -22,12 +36,25 @@ namespace Rigger.Injection
         {
             get
             {
+
                 if (_instanceInternal == null)
                 {
                     var instanceFactory = Services.GetService<IInstanceFactory>();
 
-                    _instanceInternal ??= instanceFactory?.Make(InstanceType) ?? Activator.CreateInstance(InstanceType, Services);
+                    if (instanceFactory == null)
+                    {
+                        Services.GetService<ILogger<SingletonServiceInstance>>()
+                            ?.LogWarning("IInstanceFactory not registered, using slow Activator");
+                    }
 
+                    _instanceInternal ??= instanceFactory?.Make(InstanceType) ?? (InstanceType.HasServiceConstructor() ? Activator.CreateInstance(InstanceType, Services) : Activator.CreateInstance(InstanceType));
+                    
+                    InstanceType
+                        .MethodsWithAttribute(typeof(OnCreateAttribute)).ForEach(o =>
+                        {
+                            new ZeroParameterMethodAccessor(o).Invoke(_instanceInternal);
+                        });
+                    
                     return _instanceInternal;
                 }
                 
@@ -35,8 +62,6 @@ namespace Rigger.Injection
                 
             }
         }
-
-        public IServices Services { get; set; }
 
         public object Get()
         {

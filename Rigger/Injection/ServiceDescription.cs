@@ -9,7 +9,7 @@ namespace Rigger.Injection
         public Type ServiceType { get; set; }
 
         public Type ImplementationType { get; set; }
-        public Func<Services, Type, object> Factory { get; set; }
+        public Func<IServices, object> Factory { get; set; }
         
         public ServiceLifecycle LifeCycle { get; set; }
 
