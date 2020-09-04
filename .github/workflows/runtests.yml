@@ -2,7 +2,9 @@ name: .NET Core
 
 on:
   push:
-    branches: [ develop, master ]
+    branches: [ develop ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
@@ -11,7 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Fetch Master Unshallow
+    - name: Fetch Unshallow
       run: git fetch --unshallow
     - name: Fetch tags for GitVersion
       run: git fetch --tags
@@ -24,14 +26,8 @@ jobs:
         dotnet-version: 3.1.101
     - name: Build with dotnet
       run: dotnet build --configuration Release
-    - name: Setup NuGet.exe for use with actions
-      uses: NuGet/setup-nuget@v1.0.2
-    - name: Nuget Pack
-      run: dotnet pack --configuration Release -p:PackageVersion=${{ steps.gitversion.outputs.SemVer }}
-    - name: Nuget Source
-      run: nuget sources add -Name "GPR" -Source "https://nuget.pkg.github.com/cyclopunk/index.json" -UserName "cyclopunk" -Password "${{ secrets.API_KEY  }}"
-    - name: Nuget Publish
-      run: nuget push **\*.nupkg -Source "GPR" -SkipDuplicate 
+    - name: Test with dotnet
+      run: dotnet test --configuration Release
       
       
     
