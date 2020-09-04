@@ -68,10 +68,7 @@ namespace Rigger.ManagedTypes
         public async Task FireAsync(object eventToFire)
         {
             var tasks = _eventRegistry.ToList().FindAll(f => f.EventType == eventToFire.GetType())
-                .Map(o => Task.Run( () =>
-                {
-                    return o?.Invoker?.Invoke(o.Receiver, eventToFire)
-                }));
+                .Map(o => Task.Run( () => o?.Invoker?.Invoke(o.Receiver, eventToFire)));
 
             await Task.WhenAll(tasks);
         }
