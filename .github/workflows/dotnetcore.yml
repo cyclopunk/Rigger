@@ -1,4 +1,4 @@
-name: Test Rigger Application
+name: Package Rigger Application
 
 on:
   push:
