@@ -67,13 +67,13 @@ namespace Rigger.ManagedTypes
         }
         public async Task FireAsync(object eventToFire)
         {
-            /*var tasks = _eventRegistry.ToList().FindAll(f => f.EventType == eventToFire.GetType())
+            var tasks = _eventRegistry.ToList().FindAll(f => f.EventType == eventToFire.GetType())
                 .Map(o => Task.Run( () =>
                 {
-                    if (o != null) return o.Invoker.Invoke(o.Receiver, eventToFire);
+                    return o?.Invoker?.Invoke(o.Receiver, eventToFire)
                 }));
 
-            await Task.WhenAll(tasks);*/
+            await Task.WhenAll(tasks);
         }
     }
 }
