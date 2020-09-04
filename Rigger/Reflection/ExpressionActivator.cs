@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -38,25 +39,20 @@ namespace Rigger.Reflection
     /// </summary>
     public class ExpressionActivator <TInstance> : IActivator<TInstance>
     {
-        private static readonly IDictionary<ConstructorInfo, ObjectActivator<TInstance>> cache =
-            new Dictionary<ConstructorInfo, ExpressionActivator<TInstance>.ObjectActivator<TInstance>>();
-        private Type _type;
+        private static readonly ConcurrentDictionary<ConstructorInfo, ObjectActivator<TInstance>> cache =
+            new ConcurrentDictionary<ConstructorInfo, ExpressionActivator<TInstance>.ObjectActivator<TInstance>>();
         private ObjectActivator<TInstance> _activator;
 
 
         public ExpressionActivator() : this(typeof(TInstance))
         {
         }
-        public ExpressionActivator(Type type)
+        public ExpressionActivator(Type type) : this(type.GetConstructors().First())
         {
-            _type = type;
-            var info = type.GetConstructors().First();
-
-            _activator = cache.GetOrPut(info, () => GetActivator<TInstance>(info));
         }
         public ExpressionActivator(ConstructorInfo info)
         {
-            _activator = cache.GetOrPut(info, () => GetActivator<TInstance>(info));
+            _activator = cache.GetOrAdd(info, GetActivator<TInstance>);
         }
 
         public TInstance Activate(params object[] args)

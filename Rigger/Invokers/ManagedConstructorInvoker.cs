@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -42,8 +43,8 @@ namespace Rigger.ManagedTypes.Implementations
     public class ManagedConstructorInvoker : IConstructorActivator, IServiceAware
     {
         
-        private static IDictionary<Type, ConstructorInfo> ctorCache =
-            new Dictionary<Type, ConstructorInfo>();
+        private static ConcurrentDictionary<Type, ConstructorInfo> ctorCache =
+            new ConcurrentDictionary<Type, ConstructorInfo>();
 
         private readonly Type _typeToConstruct;
 
@@ -77,7 +78,7 @@ namespace Rigger.ManagedTypes.Implementations
         public object Construct(Type type, params object[] parameters)
         {
 
-            ILogger log = Services.GetService<ILogger>();
+            // ILogger<ManagedConstructorInvoker> log = Services.GetService<ILogger<ManagedConstructorInvoker>>();
 
            // log?.LogInformation($"ManagedConstructorInvoker: Constructing {_typeToConstruct.Name} parameters: {string.Join(',',parameters)}");
             
@@ -109,7 +110,7 @@ namespace Rigger.ManagedTypes.Implementations
                // log.LogInformation("Trying to construct " + constructor);
             try
             {
-                var constructor = ctorCache.GetOrPut(type, () => FindBestConstructor(constructors));
+                var constructor = ctorCache.GetOrAdd(type, (t) => FindBestConstructor(constructors));
 
                 var paramsList = constructor
                     .GetParameters()
@@ -132,7 +133,7 @@ namespace Rigger.ManagedTypes.Implementations
 
                 if (allParameters.Count() != constructor.GetParameters()?.Length)
                 {
-                    log.LogError("ManagedConstructorInvoker: Param count doesn't match.");
+                    //log.LogError("ManagedConstructorInvoker: Param count doesn't match.");
 
                     return null;
                 }
@@ -144,7 +145,7 @@ namespace Rigger.ManagedTypes.Implementations
             }
             catch (Exception e)
             {
-                log.LogError(e,$"Could not instantiate using constructor {type.Name}({constructors}");
+                Debug.WriteLine(e,$"Could not instantiate using constructor {type.Name}({constructors}");
             }
 
             return null;

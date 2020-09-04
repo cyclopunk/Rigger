@@ -14,27 +14,35 @@ namespace Rigger.ManagedTypes.Features
     /// </summary>
     public class ContainerAutowirer : IAutowirer, IServiceAware
     {
-        private static IDictionary<Type, List<ExpressionPropertyAccessor>> _cache =
-            new ConcurrentDictionary<Type, List<ExpressionPropertyAccessor>>(); 
-        private static IDictionary<Type, List<ExpressionFieldAccessor>> _fieldCache =
-            new ConcurrentDictionary<Type, List<ExpressionFieldAccessor>>();
+        private static ConcurrentDictionary<Type, ConcurrentBag<ExpressionPropertyAccessor>> _cache =
+            new ConcurrentDictionary<Type, ConcurrentBag<ExpressionPropertyAccessor>>(); 
+        private static ConcurrentDictionary<Type, ConcurrentBag<ExpressionFieldAccessor>> _fieldCache =
+            new ConcurrentDictionary<Type, ConcurrentBag<ExpressionFieldAccessor>>();
         public IServices Services { get; set; }
 
         public void CacheType(Type type)
         {
-            var propList = _cache.GetOrPut(type, () => new List<ExpressionPropertyAccessor>());
-            var fieldList = _fieldCache.GetOrPut(type, () => new List<ExpressionFieldAccessor>());
             type.PropertyWithAttribute<AutowireAttribute>().ForEach(property =>
             {
-                propList.Add(new ExpressionPropertyAccessor(property));
+                var accessor = new ExpressionPropertyAccessor(property);
+                _cache.AddOrUpdate(type, new ConcurrentBag<ExpressionPropertyAccessor> {accessor}, (key, value) =>
+                {
+                    value.Add(accessor);
+                    return value;
+                });
             });
 
             // inject into fields
             type.FieldsWithAttribute<AutowireAttribute>()
                 .ForEach(field =>
                 {
-                    var list = _fieldCache.GetOrPut(type, () => new List<ExpressionFieldAccessor>());
-                    fieldList.Add(new ExpressionFieldAccessor(field));
+                    var accessor = new ExpressionFieldAccessor(field);
+
+                    _fieldCache.AddOrUpdate(type, new ConcurrentBag<ExpressionFieldAccessor> {accessor}, (key, value) =>
+                    {
+                        value.Add(accessor);
+                        return value;
+                    });
                 });
         }
         public TRType Inject<TRType>(TRType objectToInjectTo)
@@ -47,9 +55,10 @@ namespace Rigger.ManagedTypes.Features
             {
                 CacheType(type);
             }
-
-            _cache[type].ForEach(o => o.SetValue(objectToInjectTo,Services.GetService(o.PropertyType)));
-            _fieldCache[type].ForEach(o => o.SetValue(objectToInjectTo, Services.GetService(o.FieldType)));
+            if (_cache.ContainsKey(type))
+                _cache[type].ForEach(o => o.SetValue(objectToInjectTo,Services.GetService(o.PropertyType)));
+            if (_fieldCache.ContainsKey(type))
+                _fieldCache[type].ForEach(o => o.SetValue(objectToInjectTo, Services.GetService(o.FieldType)));
 
             return objectToInjectTo;
         }
