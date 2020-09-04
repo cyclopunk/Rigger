@@ -28,8 +28,6 @@ jobs:
       run: dotnet build --configuration Release
     - name: Setup NuGet.exe for use with actions
       uses: NuGet/setup-nuget@v1.0.2
-      with:
-        nuget-api-key: ${{ secrets.GITHUB_TOKEN }}
     - name: Nuget Pack
       run: dotnet pack --configuration Release -p:PackageVersion=${{ steps.gitversion.outputs.SemVer }}
     - name: Nuget Source

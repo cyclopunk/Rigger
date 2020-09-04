@@ -1,4 +1,5 @@
 ﻿using Drone;
+using Drone.Tests;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Rigger.Attributes;
@@ -8,7 +9,7 @@ using Rigger.Tests;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Drone
+namespace Drone.Tests
 {
    [Singleton]
    public class TestService { }
@@ -44,6 +45,11 @@ namespace Rigger.Tests
     }
     public class RiggedApp : Rig
     {
+        // this app will scan all of the components from the namespace "Drone.Tests"
+        public RiggedApp() : base("Drone.Tests")
+        {
+
+        }
     }
     public class RiggerTests
     {

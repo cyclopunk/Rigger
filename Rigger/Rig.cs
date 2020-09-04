@@ -22,7 +22,7 @@ namespace Rigger {
    /// the project. A SimpleInjector example is provided with this library as a reference
    /// implementation.
    /// </summary>
-    public class Rig : IContainer, IServiceProvider
+    public class Rig : IContainer
    {
 
        private static string PLUGIN_NAMESPACE = "Drone";
