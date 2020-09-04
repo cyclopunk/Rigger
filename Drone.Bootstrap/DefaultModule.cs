@@ -19,10 +19,10 @@ namespace Drone.Bootstrap
     ///
     /// This default can be changed by other modules in the component scanning paths.
     /// </summary>
-    [Module]
+    [Module(Priority = -1)]
     public class DefaultModule
     {
-        public DefaultModule(Services services)
+        public DefaultModule(IServices services)
         {
             services
                 .Add(typeof(ILoggerFactory), typeof(ConsoleLogger))
@@ -30,9 +30,11 @@ namespace Drone.Bootstrap
                 .Add<IConstructorActivator,ManagedConstructorInvoker>() // faster activator
                 .Add<IInstanceFactory,AutowireInstanceFactory>() // factory that will create autowired instances
                 .Add<IComponentHandler<SingletonAttribute>, SingletonComponentHandler>()  // add component handlers for managed types
-                .Add<IComponentHandler<ManagedAttribute>, ManagedComponentHandler>()
+                .Add<IComponentHandler<ManagedAttribute>, ManagedComponentHandler>() 
+                .Add<IComponentHandler<BootstrapAttribute>, BootstrapComponentHandler>()
                 .Add<IComponentScanner, SingletonComponentScanner>() 
                 .Add<IComponentScanner, ManagedComponentScanner>()
+                .Add<IComponentScanner, BootstrapComponentScanner>()
                 .Add(typeof(ILogger<>), typeof(Logger<>)) // logging
                 .Add<IServiceProvider>(services) // reference to self
                 .Add<IServiceScopeFactory, ServiceScopeFactory>(); // scoped support

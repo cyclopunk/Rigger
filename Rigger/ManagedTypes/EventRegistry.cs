@@ -43,12 +43,16 @@ namespace Rigger.ManagedTypes
                 _eventRegistry.GetOrPut(instance, () => new List<IEventReceiver>());
 
                 OnEventAttribute attr = o.GetCustomAttribute<OnEventAttribute>();
+                _typeCache.GetOrPut( attr.Event, () => new List<IEventReceiver>());
+
+                ManagedMethodInvoker invoker = new ManagedMethodInvoker(o);
+                invoker.AddServices(Services);
 
                 var registration = new EventReceiver
                 {
                     Receiver = instance,
                     EventType = attr.Event,
-                    Invoker = new ManagedMethodInvoker(instance.GetType(), o.Name)
+                    Invoker = invoker
                 };
 
                 _eventRegistry[instance].Add(registration);
@@ -83,7 +87,7 @@ namespace Rigger.ManagedTypes
         public async Task FireAsync(object eventToFire)
         {
             var tasks = _typeCache[eventToFire.GetType()].ToList().FindAll(f => f.EventType == eventToFire.GetType())
-                .Map(o => Task.Run( () => o?.Invoker?.Invoke(o.Receiver, eventToFire)));
+                .Map(o => (Task) o?.Invoker?.Invoke(o.Receiver, eventToFire));
 
             await Task.WhenAll(tasks);
         }

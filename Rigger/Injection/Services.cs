@@ -199,17 +199,17 @@ namespace Rigger.Injection
         /// <param name="description"></param>
         /// <param name="lookupType"></param>
         /// <returns></returns>
-        internal IServiceInstance GetServiceInstance(ServiceDescription description, Type lookupType)
+        internal IServiceInstance GetServiceInstance(ServiceDescription description, Type lookupType, Type overrideImplType=null)
         {
             return description.LifeCycle switch
             {
                 ServiceLifecycle.Singleton => new SingletonServiceInstance
-                    {InstanceType = description.ImplementationType, LookupType = lookupType, ServiceType = description.ServiceType}.AddServices(this),
+                    {InstanceType = overrideImplType ?? description.ImplementationType, LookupType = lookupType, ServiceType = description.ServiceType}.AddServices(this),
                 ServiceLifecycle.Scoped => new ScopedServiceInstance
-                    {InstanceType = description.ImplementationType, LookupType = lookupType, ServiceType = description.ServiceType}.AddServices(this),
+                    {InstanceType = overrideImplType ?? description.ImplementationType, LookupType = lookupType, ServiceType = description.ServiceType}.AddServices(this),
                 ServiceLifecycle.Thread =>new ThreadServiceInstance
                     {InstanceType = description.ImplementationType, LookupType = lookupType, ServiceType = description.ServiceType}.AddServices(this),
-                _ => new DefaultServiceInstance {InstanceType = description.ImplementationType, LookupType = lookupType, ServiceType = description.ServiceType}.AddServices(this)
+                _ => new DefaultServiceInstance {InstanceType = overrideImplType ?? description.ImplementationType, LookupType = lookupType, ServiceType = description.ServiceType}.AddServices(this)
             };
         }
 
@@ -238,7 +238,7 @@ namespace Rigger.Injection
             desc?.AllTypes()?.ForEach(o =>
             {
                 // create an instance activator for all types if one doesn't exist
-                var instance = _instanceMap.GetOrPut(o, () => GetServiceInstance(desc, serviceType));
+                var instance = _instanceMap.GetOrPut(o, () => GetServiceInstance(desc, o, o));
                 
                 // add it to the list using the method accessor
 
@@ -306,6 +306,7 @@ namespace Rigger.Injection
                         svc.AddServices(this);
                     }
 
+
                     return newInstance;
                 }
             }
@@ -323,6 +324,32 @@ namespace Rigger.Injection
             return  i;
         }
 
+        /// <summary>
+        /// Replace a service 
+        /// </summary>
+        /// <typeparam name="T">The service to replace</typeparam>
+        /// <typeparam name="R">The concrete type of the service</typeparam>
+        public IServices Replace<T, R>() where R : T
+        {
+            if (_descriptionMap.ContainsKey(typeof(T)))
+            {
+                Remove<T>();
+            }
+            Add<T, R>();
+
+            return this;
+        }
+        public IServices Replace<T, R>(R instance) where R : T
+        {
+            if (_descriptionMap.ContainsKey(typeof(T)))
+            {
+                Remove<T>();
+            }
+
+            Add<T>(instance);
+
+            return this;
+        }
         public void Dispose()
         {
             if (!_disposedValue)

@@ -20,9 +20,9 @@ namespace Rigger.ManagedTypes.Implementations
     ///  }
     /// where logger would be looked up in the container.
     /// </summary>
-    public class ManagedMethodInvoker : IMethodInvoker
+    public class ManagedMethodInvoker : IMethodInvoker, IServiceAware
     {
-        [Autowire] private IServiceProvider _services;
+        [Autowire] public IServices Services { get; set; }
         public string MethodName { get; set; }
 
         private MethodInfo _info;
@@ -51,7 +51,7 @@ namespace Rigger.ManagedTypes.Implementations
         {
             // parameter resolution via container lookup
 
-            if (_services == null)
+            if (Services == null)
             {
                 throw new ContainerException($"Cannot autowire {MethodName} for {dest} because the invoker lacks a container.");
             }
@@ -62,7 +62,7 @@ namespace Rigger.ManagedTypes.Implementations
             {
 
                 var types = genericArguments
-                    .Select(arg => _services.GetService(arg.BaseType).GetType())
+                    .Select(arg => Services.GetService(arg.BaseType).GetType())
                     .ToArray();
                 
                 _info = _info.MakeGenericMethod(types);
@@ -77,7 +77,7 @@ namespace Rigger.ManagedTypes.Implementations
                     try
                     { 
                         // parameter type may be an inherited type, so try the base type as a lookup as well.
-                        return _services.GetService(m.ParameterType) ?? _services.GetService(m.ParameterType.BaseType);
+                        return Services.GetService(m.ParameterType) ?? Services.GetService(m.ParameterType.BaseType);
                     }
                     catch (Exception)
                     {
@@ -92,9 +92,7 @@ namespace Rigger.ManagedTypes.Implementations
 
         private List<object> ResolveParameters()
         {
-            return _info.GetParameters().Map(m => _services.GetService(m.GetType()));
+            return _info.GetParameters().Map(m => Services.GetService(m.GetType()));
         }
-
-        public IServices Services { get; set; }
     }
 }

@@ -6,5 +6,10 @@ namespace Rigger.Attributes
     public class OnEventAttribute : Attribute, ILifecycle
     {
         public Type Event { get; set; }
+
+        public OnEventAttribute (Type evt)
+        {
+            this.Event = evt;
+        }
     }
 }

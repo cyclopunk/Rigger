@@ -84,10 +84,10 @@ public class WebClientService
 }
 ```
 
-### Bootstrap
+### Bootstrap - NOT IMPLEMENTED
 
 Bootstrap classes are instantiated at the end of the component scanning process and
-respond to OnCreate and OnStartup lifecycle events. All Managed, Singleton and Configuration
+are good places to put to OnCreate lifecycle events. All Managed, Singleton and Configuration
 types are available during the lifecycle of a bootstrap class. 
 
 Bootstrap classes are used to intialize the environment of a running application.
@@ -115,7 +115,7 @@ public class BootstrapService
 }
 ```
 
-## Lifecycle Attributes
+## Lifecycle Attributes - OnCreate Implemented, others not
 
 There are numerious lifecycle attributes which determine behavior when an the container starts or an object is Created / Destroyed / etc. Additional lifecycle 
 attributes can be added by inheriting the ILifecycle interface. The InstanceFactory can then be modified to use these lifecycle types. All managed types
@@ -131,7 +131,7 @@ be used.
 
 Here are a few more advanced concepts that the framework provides.
 
-### Conditional Implementations
+### Conditional Implementations - NOT IMPLEMENTED
 
 It is possible to feature flag implementations using a system of Conditional Singletons. 
 
@@ -139,6 +139,24 @@ It is possible to feature flag implementations using a system of Conditional Sin
 interface IConditionalService
 {
     void DoSomething()
+}
+
+/// <summary>
+/// Basic configuration that will set it to the Green environment.
+/// </summary>
+[Configuration]
+class ConfigurationSetup
+{
+    public ConfigurationSetup(IServices container)
+    {
+        container.Get<IConfigurationService>().AddSource(new MapConfigurationSource
+        {
+            BackingMap = new Dictionary<string, object>
+            {
+                {"Color", "Green"}
+            }
+        });
+    }
 }
 
 [Singleton]
@@ -166,27 +184,9 @@ class ManagedService
 }
 
 /// <summary>
-/// Basic configuration that will set it to the Green environment.
-/// </summary>
-[Configuration]
-class ConfigurationSetup
-{
-    [Autowire]
-    public ConfigurationSetup(IContainer container)
-    {
-        container.Get<IConfigurationService>().AddSource(new MapConfigurationSource
-        {
-            BackingMap = new Dictionary<string, object>
-            {
-                {"Color", "Green"}
-            }
-        });
-    }
-}
-/// <summary>
 /// An application that will use feature flagging to load two different services
 /// </summary>
-class FeatureFlagApplication : ApplicationContainer
+class FeatureFlagApplication : Rig
 {
     public FeatureFlagApplication()
     {
@@ -198,15 +198,15 @@ class FeatureFlagApplication : ApplicationContainer
 ### Application Event Pipeline
 
 Any managed type can be an event receiver. Just mark any method with 
-[OnEvent(EventType=typeof(SomeEventClass))]
+[OnEvent(typeof(SomeEventClass))]
 
 ```
 [Singleton]
 class SingletonEventReceiver {
     [Autowire] private ISomeEventClassProcessor process;
 
-    [OnEvent(EventType=typeof(SomeEventClass))]
-    public void GotEvent(IContainer container, SomeEventClass evt) {
+    [OnEvent(typeof(SomeEventClass))]
+    public void GotEvent(SomeEventClass evt) {
         process.processEvent(evt)
     }
 }
@@ -221,7 +221,6 @@ class SomeEventSender {
     [Autowire] private IEventRegistry events;
     
     public void SendEvent(){
-        // FireAsync is available, but is currently untested.
         events.Fire(new SomeEventClass {
             EventData = "Whatever Data You Want"
         }); // all event receivers listening for this class will get this event
@@ -241,7 +240,7 @@ class ConfigureTestLoggerModule
 {
     public static ITestOutputHelper output;
 
-    public ConfigureTestLoggerModule(Services services)
+    public ConfigureTestLoggerModule(IServices services)
     {
         services.Replace<ILoggerFactory>(new TestLogger(output).LoggerFactory)
     }

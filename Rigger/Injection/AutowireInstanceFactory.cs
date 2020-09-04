@@ -18,6 +18,8 @@ namespace Rigger.Injection
             if (typeof(IConstructorActivator).IsAssignableFrom (type))
             {
                 instance = Activator.CreateInstance(type, new object[] { });
+                if (instance is IServiceAware i) i.AddServices(Services);
+                return instance;
             }
 
             IConstructorActivator invoker = Services.GetService<IConstructorActivator>();
@@ -26,15 +28,10 @@ namespace Rigger.Injection
             if (typeof(IAutowirer).IsAssignableFrom (type))
             {
                 instance = invoker?.Construct(type, new object[] { });
-            }
-
-            // if we've created an instance above, return it and add the services if it is service aware.
-            if (instance is IServiceAware i)
-            {
-                i.AddServices(Services);
-
+                if (instance is IServiceAware i) i.AddServices(Services);
                 return instance;
-            } else if (instance != null) return instance;
+            }
+            // if we've created an instance above, return it and add the services if it is service aware.
 
             IAutowirer autowire = Services.GetService<IAutowirer>();
 
