@@ -49,9 +49,8 @@ namespace Rigger.Tests
                 .Add<IConstructorActivator>(new ManagedConstructorInvoker())
                 .Add<IInstanceFactory,AutowireInstanceFactory>()
                 .Add<IScopedService, ScopedService>(ServiceLifecycle.Scoped)
-                .Add<IScopedService2, ScopedService>(ServiceLifecycle.Scoped);
-
-                services.Add<IServiceScopeFactory, ServiceScopeFactory>();
+                .Add<IScopedService2, ScopedService>(ServiceLifecycle.Scoped)
+                .Add<IServiceScopeFactory, ServiceScopeFactory>();
 
                 return services;
         }
@@ -81,6 +80,7 @@ namespace Rigger.Tests
                 s2 = scope.ServiceProvider.GetService<IScopedService>();
                 output.WriteLine($"{s1} {s2}");
             }
+
             using (var scope = services.GetService<IServiceScopeFactory>().CreateScope())
             {
                 s3 = scope.ServiceProvider.GetService<IScopedService>();
