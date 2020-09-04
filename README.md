@@ -240,6 +240,7 @@ class ConfigureTestLoggerModule
 {
     public static ITestOutputHelper output;
 
+
     public ConfigureTestLoggerModule(IServices services)
     {
         services.Replace<ILoggerFactory>(new TestLogger(output).LoggerFactory)
