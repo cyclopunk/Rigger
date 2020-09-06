@@ -1,6 +1,8 @@
 name: Package Rigger Application
 
 on:
+  push:
+    branches: [ master ]
   pull_request:
     types: [ closed ]
     branches: [ master ]
