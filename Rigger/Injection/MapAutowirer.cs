@@ -4,7 +4,7 @@ using Rigger.Extensions;
 using Rigger.Exceptions;
 using Rigger.Attributes;
 
-namespace Rigger.ManagedTypes.Features
+namespace Rigger.Injection
 {
     /// <summary>
     /// A simple autowirer that uses a map to inject instances into

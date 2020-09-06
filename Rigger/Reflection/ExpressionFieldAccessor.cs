@@ -10,6 +10,7 @@ namespace Rigger.Reflection
     /// </summary>
     public class ExpressionFieldAccessor : IFieldInvoker, IValueGetter
     {
+        public FieldInfo Field { get; private set; }
         public bool IsStatic { get; private set; }
         private readonly Action<object, object> fieldSetter;
         private readonly Func<object, object> fieldGetter;
@@ -30,6 +31,7 @@ namespace Rigger.Reflection
         }
         public ExpressionFieldAccessor(FieldInfo fieldInfo)
         {
+            Field = fieldInfo;
             FieldType = fieldInfo.FieldType;
             IsStatic = fieldInfo.IsStatic;
             fieldGetter = GetGetFieldDelegate(fieldInfo);
@@ -50,11 +52,10 @@ namespace Rigger.Reflection
 
             MemberExpression fieldExpression = Expression.Field(IsStatic ? null : sourceExpression, fieldInfo);
 
+
+
             Expression resultExpression = this.GetCastOrConvertExpression(
                 fieldExpression, typeof(object));
-
-            LambdaExpression lambda =
-                Expression.Lambda<Func<object,object>>(resultExpression, sourceParameter);
 
             return Expression.Lambda<Func<object, object>>(resultExpression, sourceParameter).Compile();
         }
@@ -94,7 +95,7 @@ namespace Rigger.Reflection
 
             if (targetType.IsAssignableFrom(expressionType))
             {
-                result = expression;
+                result = Expression.Convert(expression, targetType);
             }
             else
             {

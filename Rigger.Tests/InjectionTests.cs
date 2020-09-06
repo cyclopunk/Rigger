@@ -8,7 +8,6 @@ using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Rigger.ManagedTypes;
-using Rigger.ManagedTypes.Features;
 using Rigger.ManagedTypes.Implementations;
 using Rigger.Attributes;
 using Rigger.Extensions;

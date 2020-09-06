@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Rigger.ManagedTypes.Features
+namespace Rigger.Utility
 {
     /// <summary>
     /// A Dictionary that will always return a value for any key passed

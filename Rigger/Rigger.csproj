@@ -28,4 +28,8 @@
     <ProjectReference Include="..\Rigger.Abstractions\Rigger.Abstractions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ManagedTypes\Features\" />
+  </ItemGroup>
+
 </Project>

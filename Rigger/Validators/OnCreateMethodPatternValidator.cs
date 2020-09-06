@@ -6,7 +6,6 @@ namespace Rigger.Validators
     /// <summary>
     /// This validator makes sure that a method that is marked as OnCreate has no parameters.
     ///
-    /// TODO Flag for removal as methods parameters can now be autowired.
     /// </summary>
     public class OnCreateMethodPatternValidator : IMethodValidator
     {
