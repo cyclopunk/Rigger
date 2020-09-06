@@ -1,3 +1,5 @@
+![Tests](https://github.com/cyclopunk/Rigger/workflows/Test%20Rigger%20Application/badge.svg)
+
 # Rigger
 
 Rigger is a framework for dependency injection, inversion of control and container-managed instances. It is a part of a greater project I'm working on. It is being developed to address some feature gaps in common C# DI frameworks. Some may notice that it is very Spring Boot-esq and that is intentional. It is the hope that this platform can be used to quickly build projects with advanced features. 
