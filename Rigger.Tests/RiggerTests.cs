@@ -69,7 +69,6 @@ namespace Rigger.Tests
         {
             TestLog.output = output;
         }
-
         [Fact]
         public void TestValueInjection()
         {

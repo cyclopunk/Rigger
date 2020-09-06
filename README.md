@@ -84,7 +84,7 @@ public class WebClientService
 }
 ```
 
-### Bootstrap - NOT IMPLEMENTED
+### Bootstrap 
 
 Bootstrap classes are instantiated at the end of the component scanning process and
 are good places to put to OnCreate lifecycle events. All Managed, Singleton and Configuration
