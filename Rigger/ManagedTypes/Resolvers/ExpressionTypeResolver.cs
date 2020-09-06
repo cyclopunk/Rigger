@@ -7,9 +7,9 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using Rigger.Configuration;
 using Rigger.Exceptions;
-using Rigger.ManagedTypes.Features;
 using Rigger.Attributes;
 using Expression = System.Linq.Expressions.Expression;
+using Rigger.Utility;
 
 namespace Rigger.ManagedTypes.Resolvers
 {

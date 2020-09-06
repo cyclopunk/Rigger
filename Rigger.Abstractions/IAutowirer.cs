@@ -1,6 +1,6 @@
 ﻿using Rigger.Attributes;
 
-namespace Rigger.ManagedTypes
+namespace Rigger.Injection
 {
     /// <summary>
     /// Interface for classes that will autowire an instance. How autowiring

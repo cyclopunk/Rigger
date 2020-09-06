@@ -10,7 +10,7 @@ namespace Rigger.ManagedTypes.Resolvers
 {
     public class ConfigurationValueResolver : IValueResolver
     {
-        [Autowire] private IContainer container;
+        [Autowire] private IServiceProvider services;
         [Autowire] private IConfigurationService configuration;
         public ConfigurationValueResolver()
         {
@@ -38,7 +38,7 @@ namespace Rigger.ManagedTypes.Resolvers
                         {
                             Type valueConverterType = typeof(IValueConverter<,>);
                             
-                            IValueConverter converter = (IValueConverter) container.Get(valueConverterType.MakeGenericType(value.GetType(), o.PropertyType));
+                            IValueConverter converter = (IValueConverter)services.GetService(valueConverterType.MakeGenericType(value.GetType(), o.PropertyType));
 
                             value = converter.Convert(value);
                         }
@@ -62,7 +62,7 @@ namespace Rigger.ManagedTypes.Resolvers
                         {
                             Type valueConverterType = typeof(IValueConverter<,>);
                             
-                            IValueConverter converter = (IValueConverter) container.Get(valueConverterType.MakeGenericType(value.GetType(), o.FieldType));
+                            IValueConverter converter = (IValueConverter) services.GetService(valueConverterType.MakeGenericType(value.GetType(), o.FieldType));
 
                             value = converter.Convert(value);
                         }

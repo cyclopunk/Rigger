@@ -3,12 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rigger.Attributes;
-using Rigger.Implementations;
-using Rigger.Injection;
 using Rigger.ManagedTypes;
-using Rigger.ManagedTypes.Features;
-using Rigger.ManagedTypes.Implementations;
-using Rigger.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 

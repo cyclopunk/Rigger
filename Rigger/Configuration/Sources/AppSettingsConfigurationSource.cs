@@ -36,18 +36,25 @@ namespace Rigger.Configuration.Sources
 
         public Dictionary<string, object> Fetch()
         {
-            var builder = new ConfigurationBuilder()
-                .AddJsonFile(filename);
-
-            var configuration = builder.Build();
+            try
+            {
             
-            var dictionary = new Dictionary<string, object>();
+                var builder = new ConfigurationBuilder()
+                    .AddJsonFile(filename);
 
-            configuration
-                .AsEnumerable()
-                .ForEach(k => dictionary.Add(k.Key, k.Value));
+                var configuration = builder.Build();
 
-            return dictionary;
+                var dictionary = new Dictionary<string, object>();
+
+                configuration
+                    .AsEnumerable()
+                    .ForEach(k => dictionary.Add(k.Key, k.Value));
+
+                return dictionary;
+            } catch (Exception e)
+            {
+                return new Dictionary<string, object>();
+            }
         }
     }
 }

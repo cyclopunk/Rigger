@@ -2,7 +2,7 @@
 
 namespace Rigger.Validators
 {
-    public interface IManagedTypeValidator
+    public interface IComponentValidator
     {
         bool Validate(Type type);
     }

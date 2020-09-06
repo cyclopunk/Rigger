@@ -31,13 +31,23 @@ namespace Rigger.Injection
                 if (instance is IServiceAware i) i.AddServices(Services);
                 return instance;
             }
+            
             // if we've created an instance above, return it and add the services if it is service aware.
 
             IAutowirer autowire = Services.GetService<IAutowirer>();
 
+            if (typeof(IValueInjector).IsAssignableFrom(type))
+            {
+                instance = invoker?.Construct(type, new object[] { });
+                if (instance is IServiceAware i) i.AddServices(Services);
+                return instance;
+            }
+            IValueInjector valueInjector = Services.GetService<IValueInjector>();
+
             instance = invoker?.Construct(type, new object[] {});
 
             autowire?.Inject(instance);
+            valueInjector?.Inject(instance);
 
             return instance;
         }

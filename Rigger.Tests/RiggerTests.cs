@@ -6,12 +6,24 @@ using Rigger.Attributes;
 using Rigger.Implementations;
 using Rigger.Injection;
 using Rigger.Tests;
+using System;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Drone.Tests
 {
-   [Singleton]
+
+    [Managed]
+    public class ValueService {
+
+        [Value]
+        public string ConfigValue { get; set; }
+
+        [Value(Key = "AnotherValue")]
+        public int AnotherValue2;
+    }
+
+    [Singleton]
    public class TestService { }
 
    [Bootstrap]
@@ -56,6 +68,20 @@ namespace Rigger.Tests
         public RiggerTests(ITestOutputHelper output)
         {
             TestLog.output = output;
+        }
+
+        [Fact]
+        public void TestValueInjection()
+        {
+            Environment.SetEnvironmentVariable("ConfigValue", "Test");
+            Environment.SetEnvironmentVariable("AnotherValue", "1");
+            RiggedApp rig = new RiggedApp();
+            rig.Register<ValueService, ValueService>();
+
+            var service = rig.Get<ValueService>();
+
+            service.ConfigValue.Should().Be("Test");
+            service.AnotherValue2.Should().Be(1);
         }
         [Fact]
         public void PutItAllTogether()

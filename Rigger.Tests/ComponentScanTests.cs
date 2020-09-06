@@ -10,7 +10,6 @@ using Rigger.Injection;
 using Rigger.ManagedTypes;
 using Rigger.ManagedTypes.ComponentHandlers;
 using Rigger.ManagedTypes.ComponentScanners;
-using Rigger.ManagedTypes.Features;
 using Rigger.ManagedTypes.Implementations;
 using Rigger.Reflection;
 using Xunit;

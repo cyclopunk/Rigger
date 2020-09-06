@@ -7,7 +7,7 @@ using Rigger.Attributes;
 using Rigger.Injection;
 using Rigger.Reflection;
 
-namespace Rigger.ManagedTypes.Features
+namespace Rigger.Injection
 {
     /// <summary>
     /// Class that will preform autowiring by iterating through fields and properties and finding the [Autowire] attribute

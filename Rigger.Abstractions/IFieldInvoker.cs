@@ -19,10 +19,10 @@ namespace Rigger.Reflection
     /// </summary>
     /// <typeparam name="TClass">The class that this field resides on</typeparam>
     /// <typeparam name="TFType">The type that this field returns.</typeparam>
-    public interface IFieldInvoker<TClass, TFType>
+    public interface IFieldInvoker<TFType>
     {
         string FieldName { get; set; }
-        void SetValue(TClass dest, TFType value);
-        object GetValue(TClass dest);
+        void SetValue(object dest, TFType value);
+        object GetValue(object dest);
     }
 }
