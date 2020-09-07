@@ -7,6 +7,12 @@ namespace Rigger.Core
 {
     public class RiggedServiceProviderFactory : IServiceProviderFactory<RiggedServiceProviderBuilder>
     {
+        public string DroneNamespace { get; set; }
+
+        public RiggedServiceProviderFactory(string droneNamespace = "Drone.")
+        {
+            DroneNamespace = droneNamespace;
+        }
         public RiggedServiceProviderBuilder CreateBuilder(IServiceCollection services)
         {
             return new RiggedServiceProviderBuilder(services);
@@ -14,7 +20,7 @@ namespace Rigger.Core
 
         public IServiceProvider CreateServiceProvider(RiggedServiceProviderBuilder containerBuilder)
         {
-           return containerBuilder.NewRig();
+           return containerBuilder.NewRig(DroneNamespace);
         }
     }
 }

@@ -150,7 +150,7 @@ namespace Rigger {
        /// as well as the executing assembly for components.
        /// </summary>
        /// <param name="assemblies"></param>
-       public Rig(params Assembly[] assemblies)
+       public Rig(Assembly[] assemblies)
        {
 
            if (!assemblies.Any() && this.GetType().GetCustomAttribute<ContainerOptionsAttribute>()?.Empty == true) return;
@@ -159,11 +159,13 @@ namespace Rigger {
        }
 
 
-       public Rig(string namespaceString)
+       public Rig(params string[] namespaceStrings)
        {
-           Console.WriteLine($"Searching domain {namespaceString} for Drones.");
+           Console.WriteLine($"Searching domain {namespaceStrings} for Drones.");
 
-           Build(DefaultAssemblies().Concat(SearchAppDomain(namespaceString)).ToArray()); 
+           var namespaceAssemblies = namespaceStrings.Select(SearchAppDomain).Combine();
+
+           Build(DefaultAssemblies().Concat(namespaceAssemblies).ToArray()); 
        }
 
        /// <summary>

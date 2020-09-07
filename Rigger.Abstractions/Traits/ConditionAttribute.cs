@@ -15,5 +15,10 @@ namespace Rigger.Attributes
         /// (e.g. config.Get("somevalue") == "someothervalue").
         /// </summary>
         public string Expression { get; set; }
+
+        public ConditionAttribute(string condition)
+        {
+            this.Expression = condition;
+        }
     }
 }

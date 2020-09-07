@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Rigger.Attributes;
 using Rigger.Extensions;
 using Rigger.Injection.Defaults;
+using Rigger.ManagedTypes.Resolvers;
 using Rigger.Reflection;
 
 namespace Rigger.Injection
@@ -52,6 +55,29 @@ namespace Rigger.Injection
 
         public IServices Add(Type lookupType, Type concreteType, ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient)
         {
+
+            var condition = concreteType.GetCustomAttribute<ConditionAttribute>();
+            if (condition != null)
+            {
+                var expression = condition.Expression;
+
+                var description = _descriptionMap.GetOrPut(lookupType, () => new ServiceDescription
+                {
+                    ServiceType = lookupType,
+                    ImplementationType = concreteType,
+                    LifeCycle = serviceLifecycle
+                });
+
+                if (description.ConditionalTypes == null && IsManaged<ExpressionTypeResolver>())
+                {
+                    description.ConditionalTypes = GetService<ExpressionTypeResolver>();
+                    
+                }
+
+                description.ConditionalTypes?.AddType(expression, concreteType);
+
+                return this;
+            }
 
             if (_descriptionMap.ContainsKey(lookupType))
             {
@@ -221,6 +247,7 @@ namespace Rigger.Injection
         /// </summary>
         /// <param name="description"></param>
         /// <param name="lookupType"></param>
+        /// <param name="overrideImplType">Type that can override the implementation type</param>
         /// <returns></returns>
         internal IServiceInstance GetServiceInstance(ServiceDescription description, Type lookupType, Type overrideImplType=null)
         {
@@ -312,6 +339,7 @@ namespace Rigger.Injection
         /// <returns></returns>
         public object GetService(Type serviceType)
         {
+
             _instanceMap.TryGetValue(serviceType, out var service);
 
             if (serviceType.IsConstructedGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
@@ -371,7 +399,7 @@ namespace Rigger.Injection
                 else
                 {
 
-                    IServiceInstance instance = GetServiceInstance(desc, serviceType);
+                    IServiceInstance instance = GetServiceInstance(desc, serviceType, desc.ConditionalTypes?.ResolveType());
 
                     _instanceMap.Add(serviceType, instance);
                     newInstance = instance.Get();

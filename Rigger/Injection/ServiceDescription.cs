@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Rigger.ManagedTypes.Resolvers;
 
 namespace Rigger.Injection
 {
@@ -12,6 +13,8 @@ namespace Rigger.Injection
         public Func<IServices, object> Factory { get; set; }
         
         public ServiceLifecycle LifeCycle { get; set; }
+
+        public ExpressionTypeResolver ConditionalTypes { get; set; }
 
         public List<Type> ExtraTypes = new List<Type>();
         public List<object> Singletons = new List<object>();

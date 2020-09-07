@@ -18,11 +18,10 @@ namespace Rigger.Core
             this.services = services;
         }
 
-        public IServiceProvider NewRig()
+        public IServiceProvider NewRig(string droneNamespace = "Drone.")
         {
-            Rig rig = new Rig("Drone");
-           
-
+            var rig = new Rig(droneNamespace);
+            
             services.ForEach(o =>
             {
                 var lifetime = o.Lifetime switch
@@ -35,19 +34,15 @@ namespace Rigger.Core
 
                 if (o.ImplementationInstance != null)
                 {
-                    Console.WriteLine($"Adding singleton {o.ServiceType} {o.ImplementationInstance}");
                     rig.Register(o.ServiceType, o.ImplementationInstance);
                 }
                 else if (o.ImplementationFactory != null)
                 {
-                    Console.WriteLine($"Adding implementation factory {o.ServiceType}");
                     // wrap impl factories
                     rig.Register(o.ServiceType, o.ImplementationFactory, lifetime);
                 }
                 else
                 {
-
-                    Console.WriteLine($"Registering {o.ServiceType.Name}, {o.ImplementationType.Name}, {lifetime}");
                     rig.Register(o.ServiceType, o.ImplementationType, lifetime);
                 }
             });

@@ -30,6 +30,7 @@ namespace Drone.Bootstrap
                 .Add<IAutowirer, ContainerAutowirer>() // add autowiring
                 .Add<IConstructorActivator,ManagedConstructorInvoker>() // faster activator
                 .Add<IInstanceFactory,AutowireInstanceFactory>() // factory that will create autowired instances
+                .Add<ExpressionTypeResolver, ExpressionTypeResolver>() // conditional services support.
                 .Add<IComponentHandler<SingletonAttribute>, SingletonComponentHandler>()  // add component handlers for managed types
                 .Add<IComponentHandler<ManagedAttribute>, ManagedComponentHandler>() 
                 .Add<IComponentHandler<BootstrapAttribute>, BootstrapComponentHandler>()

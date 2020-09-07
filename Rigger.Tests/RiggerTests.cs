@@ -7,11 +7,35 @@ using Rigger.Implementations;
 using Rigger.Injection;
 using Rigger.Tests;
 using System;
+using Rigger.Configuration;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Drone.Tests
 {
+    public interface IConditionalService
+    {
+        public string GetColor();
+    }
+    [Managed]
+    [Condition("ServiceColor == Blue")]
+    public class BlueService : IConditionalService
+    {
+        public string GetColor()
+        {
+            return "Blue";
+        }
+    }
+    [Managed]
+    [Condition("ServiceColor == Green")]
+    public class GreenService : IConditionalService
+    {
+        public string GetColor()
+        {
+            return "Green";
+        }
+    }
+
 
     [Managed]
     public class ValueService {
@@ -45,6 +69,7 @@ namespace Drone.Tests
    {
        public TestModule(IServices services)
        {
+
            services.Replace<ILoggerFactory, ILoggerFactory>(new TestLogger(TestLog.output).LoggerFactory);
        }
    }
@@ -68,6 +93,22 @@ namespace Rigger.Tests
         public RiggerTests(ITestOutputHelper output)
         {
             TestLog.output = output;
+        }
+        [Fact]
+        public void TestConditionalServices()
+        {
+            Environment.SetEnvironmentVariable("ServiceColor", "Green");
+
+            RiggedApp rig = new RiggedApp();
+
+            rig.Get<IConfigurationService>().Get("ServiceColor").Should().Be("Green");
+
+            //rig.Register<IConditionalService, BlueService>();
+            //rig.Register<IConditionalService, GreenService>();
+
+            var conditionalService = rig.Get<IConditionalService>();
+
+            conditionalService.GetColor().Should().Be("Green");
         }
         [Fact]
         public void TestValueInjection()

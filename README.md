@@ -2,14 +2,20 @@
 
 # Rigger
 
-Rigger is a framework for dependency injection, inversion of control and container-managed instances. It is a part of a greater project I'm working on. It is being developed to address some feature gaps in common C# DI frameworks. Some may notice that it is very Spring Boot-esq and that is intentional. It is the hope that this platform can be used to quickly build projects with advanced features. 
+Rigger is a framework that adds dependency injection, lifecycle managerment, application eventing and other services to a DotNet application with very minimal setup. 
+
+It was developed to address some feature gaps that I was struggling with in C# DI frameworks, and to reduce the startup time for projects that I was working on for my job and personally. 
+
+I owe much of the "feel" and ergonomics of Rigger to the SpringBoot project. I hope that Rigger will be used to quickly build projects and prototypes with advanced features. 
 
 Rigger is designed to be fast, lightweight, extensible and easy to use (configuration-lite). 
 
 Rigger is also a drop-in replacement for IServiceProvider for dotnetcore projects.
 
+The project name and plugin scheme is inspired by the Role Playing Game Shadowrun. Riggers augment their capabilities by using autonomous drones with different features.
+
 ### Features
-+ Component Scanning
++ Component Scanning - Rigger does not use a single configuration file to manage DI, it scans the assembly at startup and registers all classes with special annotations.
 + Attribute based registration and autowiring.
 + Configuration-based Value Injection
 + Transient, Singleton, Scopped and Thread based registrations
@@ -20,29 +26,45 @@ Rigger is also a drop-in replacement for IServiceProvider for dotnetcore project
 + Cached expression-based Member Invokers and Constructor Activators for speedy autowiring.
 + Module / Plugin System for Extensibility (Drones)
 + Fail Fast application startup.
-+ Managed startup lifecycle and dependency ordering (Module -> Configuration -> Managed -> Singleton -> Bootstrap).
++ Managed startup lifecycle and dependency ordering.
 + Include Additional Drone libraries for added functionality :
   - Drone.Cloud, unified cloud services automatically configured and injected into the container
   - Drone.API, automatically bootstraps a GraphQL endpoint that integrates your entity model
   - Drone.Data, Wide Column Storage, ML Services, And Statistical Services
   - Drone.Chronos, Timer functionality for services.
++ Extreme framework flexability - All basic functionality can be replaced by using Replace<OldImpl, NewImpl>() on the Rig. Here are some basic services with default implementations:
+    - IAutowirer - Autowires an instance by looking up services and injecting them into fields or properties.
+    - IConfigurationService - A container wide configuration service
+    - IMethodInvoker - Invokes a method with parameters from the container.
+    - IEventRegistry - Registers managed instances as event receivers and dispatches events
+    - IInstanceFactory - Create's fully managed instances (Autowired, Value Injected, Fast Constructed by default)
+    - IConstructorActivator - Finds the most appropriate constructor and tries to create an object using  it
+    - IValueInjector - Scans a class for [Value] attributes and automatically inserts them where possible
++ POCOs - Currently there are no proxies being used. Types that are managed by the container are merely POCOs with Attributes.
+
 
 ### TODO 
-I recently refactored this from another project, so there's a lot to do before I can consider this "stable".
 
-- Reintegrate Conditional Services
+- Class protection level changes
+- Example projects.
+- More testing
+- Benchmarking 
+- Re-integration of drones.
+- Container validation (circular depdendnecies, conditional issues)
 
 
 ## Quickstart
 
 To create a Rigged application, it is as simple as inheriting from the Rig class. Merely instantiating that class, or inheriting from it, will trigger
 the configuration of the application. This will start the component scanning part of the framework and it will discover all components
-that are marked with a Managed Type attribute. You can pass in additional assemblies or namespace strings to the Rig constructor in order to 
+that are marked with a Rigger class attribute. You can pass in additional assemblies or namespace strings to the Rig constructor in order to 
 include other Assemblies in your application. This will allow a plugin type style of development.
+
+In order to use it with Asp.Net Core, just call `.UseServiceProviderFactory(new RiggedServiceProviderFactory())` on your IHostBuilder. And make sure to .AddControllersAsServices() if you want to use [Autowire] and [Value].
                         
 ### Singleton
 
-Singletons are scanned after configurations. They are not instantiated
+Singletons are scanned after modules. They are not instantiated
 until requested from the container or autowired into another service.
 
 ```
@@ -124,53 +146,34 @@ Values can be injected into constructors, fields and properties automatically. T
 By default the IValueInjector will use the IConfigurationService and lookup a Key. The key can be specified on the attribute or if it is not specified the field / property / parameter name will
 be used.
 
-## Advanced Concepts
+## Conditional Implementations
 
-Here are a few more advanced concepts that the framework provides.
+It is possible to feature flag implementations using the Condition attribute. Currently these conditions are set up upon registration / scanning. So once a service
+is instantiated once it will continue to be that service for the lifetime of the scope (which may be the application lifetime).
 
-### Conditional Implementations - NOT IMPLEMENTED
-
-It is possible to feature flag implementations using a system of Conditional Singletons. 
+It is possible to support hot-swapping of configuration values, but the default implementation does not support this.
 
 ```
 interface IConditionalService
 {
-    void DoSomething()
-}
-
-/// <summary>
-/// Basic configuration that will set it to the Green environment.
-/// </summary>
-[Configuration]
-class ConfigurationSetup
-{
-    public ConfigurationSetup(IServices container)
-    {
-        container.Get<IConfigurationService>().AddSource(new MapConfigurationSource
-        {
-            BackingMap = new Dictionary<string, object>
-            {
-                {"Color", "Green"}
-            }
-        });
-    }
+    void GetColor()
 }
 
 [Singleton]
-[Condition(Expression = @"Color == Green")] // No need for quotes around strings
+[Condition(@"ServiceColor == Green")] // No need for quotes around strings
 class GreenService : IConditionalService
 {
-    public void DoSomething(){
-        Console.WriteLine("It's Green!")
+    public string GetColor(){
+        return "Green";
 	}
 }
 
 [Singleton]
-[Condition(Expression = @"Color == Blue")] // Color is a configuration key, any configuration key can be used.
+[Condition(@"ServiceColor == Blue")] // Color is a configuration key, any configuration key can be used.
 class BlueService : IConditionalService
 {
-    public void DoSomething(){
-        Console.WriteLine("It's Blue!")
+    public string GetColor(){
+        return "Blue";
 	}
 }
 
@@ -187,15 +190,14 @@ class FeatureFlagApplication : Rig
 {
     public FeatureFlagApplication()
     {
-        
+       Environment.SetEnvironmentVariable("ServiceColor", "Green");
     }
 }
 ``` 
 
-### Application Event Pipeline
+## Application Event Pipeline
 
-Any managed type can be an event receiver. Just mark any method with 
-[OnEvent(typeof(SomeEventClass))]
+Any managed type can be an event receiver. Just mark any method with `[OnEvent(typeof(SomeEventClass))]`. Note: Only transient objects that are still alive will receive this message.
 
 ```
 [Singleton]
@@ -227,21 +229,56 @@ class SomeEventSender {
 ```
 
 ## Testing in the container
-If you wish to test the application you're building from within a forge
-application container, here are a few things you can do to help out.
 
-### Configuring Test Logging
+Testing can be acommplished inside and outside the Rigged application. Since managed types are just POCOs
+Unit testing should be a breeze. If you want to mock services or install your own defaults you can use the "Replace" 
+method on services.
+
+You can use a Drone namespace to add new managed components to your tests as well.
+
 ```
-[Module]
-class ConfigureTestLoggerModule
-{
-    public static ITestOutputHelper output;
+namespace Drone.MyTests {
+    [Singleton]
+    public class SingletonService {
 
-
-    public ConfigureTestLoggerModule(IServices services)
-    {
-        services.Replace<ILoggerFactory>(new TestLogger(output).LoggerFactory)
     }
 }
 
+[Fact]
+public void MyTest {
+    Rig rig = new Rig("Drone.MyTests")
+
+    var service = rig.Get<SingletonService>(); // this should not be null
+}
+```
+
+### Configuring Test Logging
+
+Rigger comes with a test logger for xUnit. Just add this module to your test Drone namespace. This will allow
+the Rigger log output to be displayed in the ITestOutputHelper.
+
+```
+namespace Drone.MyTests {
+    public static ITestOutputHelper output;
+    [Module(Priority=1)]
+    public class ChangeLogger {
+
+        // services are automatically injected into all module constructors.
+        public ChangeLogger(IServices services){
+            services.Replace<ILoggerFactory>(new TestLogger(output).LoggerFactory)
+        }
+    }
+}
+
+public class xUnitTests {
+    public xUnitTests(ITestOutputHelper output){
+        ChangeLogger.output = output;        
+    }
+    [Fact]
+    public void MyTest {
+        Rig rig = new Rig("Drone.MyTests")
+
+        var testLogger = rig.Get<ILogger<xUnitTests>>();
+    }
+}
 ```
