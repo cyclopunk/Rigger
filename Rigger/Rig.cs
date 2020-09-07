@@ -64,7 +64,14 @@ namespace Rigger {
            return this;
        }
 
-       public TManagedType RegisterAndGet<TManagedType>(params object[] constructorParams) where TManagedType : class
+       public IContainer Register(Type lookupType, Type implType, ServiceLifecycle lifecycle = ServiceLifecycle.Singleton)
+        {
+            Services.Add(lookupType, implType, lifecycle);
+
+            return this;
+        }
+
+        public TManagedType RegisterAndGet<TManagedType>(params object[] constructorParams) where TManagedType : class
        {
            return Services.Add<TManagedType, TManagedType>().GetService<TManagedType>();
        }
@@ -211,5 +218,12 @@ namespace Rigger {
 
             return instance;
         }
-   }
+
+        public IContainer Register(Type lookupType, Func<IServices, object> factory, ServiceLifecycle serviceLifecycle = ServiceLifecycle.Singleton)
+        {
+            Services.Add(lookupType, factory, serviceLifecycle);
+
+            return this;
+        }
+    }
 }

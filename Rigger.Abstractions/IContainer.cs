@@ -35,13 +35,21 @@ namespace Rigger.ManagedTypes
        /// <param name="instance"></param>
        /// <returns></returns>
        IContainer Register(Type type, object instance);
-       /// <summary>
-       /// Register a singleton with the provided type;
-       /// </summary>
-       /// <typeparam name="TType"></typeparam>
-       /// <param name="instance"></param>
-       /// <returns></returns>
-       IContainer Register<TType>(object instance);
+        /// <summary>
+        /// Register a singleton of a type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="instance"></param>
+        /// <returns></returns>
+
+        IContainer Register(Type lookupType, Func<IServices, object> factory, ServiceLifecycle serviceLifecycle = ServiceLifecycle.Singleton);
+        /// <summary>
+        /// Register a singleton with the provided type;
+        /// </summary>
+        /// <typeparam name="TType"></typeparam>
+        /// <param name="instance"></param>
+        /// <returns></returns>
+        IContainer Register<TType>(object instance);
         /// <summary>
         /// Register a concrete type by another type. 
         /// </summary>

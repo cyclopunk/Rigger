@@ -15,9 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rigger.Abstractions", "Rigg
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3966D51A-901A-4AD5-93BE-697904DA8238}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\dotnetcore.yml = .github\workflows\dotnetcore.yml
+		.github\workflows\development-build.yml = .github\workflows\development-build.yml
+		.github\workflows\master-build.yml = .github\workflows\master-build.yml
 		README.md = README.md
-		.github\workflows\runtests.yml = .github\workflows\runtests.yml
 	EndProjectSection
 EndProject
 Global
