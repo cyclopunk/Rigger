@@ -18,7 +18,7 @@ namespace Rigger.Core
 
         public IServiceProvider NewRig()
         {
-            Rig rig = new Rig();
+            Rig rig = new Rig("Drone");
             services.ForEach(o =>
             {
                 var lifetime = o.Lifetime switch
@@ -38,10 +38,7 @@ namespace Rigger.Core
                 if (o.ImplementationFactory != null)
                 {
                     // wrap impl factories
-                    rig.Register(o.ServiceType, (services) =>
-                    {
-                        return o.ImplementationFactory.Invoke(services);
-                    }, lifetime);
+                    rig.Register(o.ServiceType, o.ImplementationFactory, lifetime);
 
                     return;
                 }
