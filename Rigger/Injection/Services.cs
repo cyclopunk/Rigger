@@ -121,6 +121,11 @@ namespace Rigger.Injection
         /// <returns></returns>
         public IServices Add(Type lookupType, Func<IServices, object> factory, ServiceLifecycle lifecycle = ServiceLifecycle.Singleton)
         {
+            if (_descriptionMap.ContainsKey(lookupType))
+            {
+                Console.WriteLine($"Removing old service description {_descriptionMap[lookupType]}, replacing with factory.");
+                Remove(lookupType);
+            }
             _descriptionMap.Add(lookupType, new ServiceDescription
             {
                 ServiceType = lookupType,
