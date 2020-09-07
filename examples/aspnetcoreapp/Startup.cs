@@ -25,6 +25,7 @@ namespace aspnetcoreapp
         {
             services.AddControllers().AddControllersAsServices();
             services.AddRazorPages();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +48,8 @@ namespace aspnetcoreapp
             app.UseRouting();
 
             app.UseAuthorization();
+
+            
 
             app.UseEndpoints(endpoints =>
             {

@@ -46,6 +46,8 @@ namespace Rigger.Core
                     rig.Register(o.ServiceType, o.ImplementationType, lifetime);
                 }
             });
+
+            
             return rig;
         }
     }

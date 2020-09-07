@@ -21,7 +21,7 @@ namespace Rigger.Injection
 
         public IEnumerable<Type> AllTypes()
         {
-            return new List<Type> {ImplementationType}.Concat(ExtraTypes);
+            return new List<Type> {ImplementationType}.Concat(ExtraTypes).Where(o => o!= null);
         }
     }
 }

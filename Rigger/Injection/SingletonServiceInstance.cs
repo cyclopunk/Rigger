@@ -29,7 +29,6 @@ namespace Rigger.Injection
 
         internal SingletonServiceInstance(object instance)
         {
-            InstanceType = instance.GetType();
             _instanceInternal = instance;
         }
         public object Instance
@@ -78,6 +77,11 @@ namespace Rigger.Injection
             // explicit for now
             Services = null;
             InstanceType = null;
+        }
+
+        public bool Is(object instance)
+        {
+            return instance == _instanceInternal;
         }
     }
 }

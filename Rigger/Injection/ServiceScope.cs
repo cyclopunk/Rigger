@@ -21,21 +21,12 @@ namespace Rigger.Injection
         {
 
         }
-        protected ServiceScope(ServiceScope parent)
-        {
-        }
-
         public IServiceProvider ServiceProvider => this;
 
         public IServices Services
         {
             get => services; 
             set => services = value.OfLifecycle(ServiceLifecycle.Singleton, ServiceLifecycle.Scoped);
-        }
-
-        public IServiceScope CreateScope()
-        {
-            return new ServiceScope(this).AddServices(services);
         }
 
         public void Dispose()
@@ -45,6 +36,10 @@ namespace Rigger.Injection
 
         public object GetService(Type serviceType)
         {
+            if (typeof(IServiceProvider).IsAssignableFrom(serviceType))
+            {
+                return this;
+            }
 
             var service = services.GetService(serviceType);
 

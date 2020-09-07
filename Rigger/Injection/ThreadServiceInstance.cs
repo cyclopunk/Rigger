@@ -48,5 +48,10 @@ namespace Rigger.Injection
         {
             _threadLocalFactory?.Dispose();
         }
+
+        public bool Is(object instance)
+        {
+            return instance == _threadLocalFactory.Value;
+        }
     }
 }

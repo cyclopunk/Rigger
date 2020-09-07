@@ -29,6 +29,8 @@ namespace Rigger {
 
        private static string PLUGIN_NAMESPACE = "Drone";
 
+       private bool _disposing = false;
+
        private ILogger<Rig> logger;
        private IEventRegistry eventRegistry;
 
@@ -242,11 +244,24 @@ namespace Rigger {
         /// </summary>
         public virtual void Dispose()
         {
+            if (_disposing)
+            {
+                return;
+            }
+
+            _disposing = true;
             Services.Dispose();
         }
 
         public async ValueTask DisposeAsync()
         {
+            if (_disposing)
+            {
+                return;
+            }
+
+            _disposing = true;
+
             await Services.DisposeAsync();
 
             await Task.CompletedTask;

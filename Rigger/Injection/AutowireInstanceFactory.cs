@@ -11,6 +11,10 @@ namespace Rigger.Injection
     {
         public IServices Services { get; set; }
 
+        private IConstructorActivator invoker;
+        private IValueInjector injector;
+        private IAutowirer autowirer;
+
         public object Make(Type type)
         {
             object instance = null;
@@ -22,7 +26,7 @@ namespace Rigger.Injection
                 return instance;
             }
 
-            IConstructorActivator invoker = Services.GetService<IConstructorActivator>();
+            invoker ??= Services.GetService<IConstructorActivator>();
 
             // loop protection
             if (typeof(IAutowirer).IsAssignableFrom (type))
@@ -33,8 +37,7 @@ namespace Rigger.Injection
             }
             
             // if we've created an instance above, return it and add the services if it is service aware.
-
-            IAutowirer autowire = Services.GetService<IAutowirer>();
+            autowirer ??= Services.GetService<IAutowirer>();
 
             if (typeof(IValueInjector).IsAssignableFrom(type))
             {
@@ -42,7 +45,7 @@ namespace Rigger.Injection
                 if (instance is IServiceAware i) i.AddServices(Services);
                 return instance;
             }
-            IValueInjector valueInjector = Services.GetService<IValueInjector>();
+            injector ??= Services.GetService<IValueInjector>();
 
             instance = invoker?.Construct(type, new object[] {});
 
@@ -51,8 +54,8 @@ namespace Rigger.Injection
                 return null;
             }
 
-            autowire?.Inject(instance);
-            valueInjector?.Inject(instance);
+            autowirer?.Inject(instance);
+            injector?.Inject(instance);
 
             return instance;
         }

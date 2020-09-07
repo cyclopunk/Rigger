@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -14,7 +15,11 @@ namespace aspnetcoreapp
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            IHostBuilder builder = CreateHostBuilder(args);
+            
+            IHost host = builder.Build();
+            
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -22,7 +27,11 @@ namespace aspnetcoreapp
                 .UseServiceProviderFactory(new RiggedServiceProviderFactory("Drone"))
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    
+                    webBuilder
+                        .UseIISIntegration() 
+                        .UseSetting("detailedErrors", "true")
+                        .UseStartup<Startup>();
                 });
     }
 }

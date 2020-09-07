@@ -127,7 +127,6 @@ namespace Rigger.Injection
             _descriptionMap.Add(type, new ServiceDescription
             {
                 ServiceType = type,
-                ImplementationType = instance.GetType(),
                 LifeCycle = ServiceLifecycle.Singleton,
                 Singletons = new List<object>() { instance }
             });
@@ -137,8 +136,6 @@ namespace Rigger.Injection
 
             autowirer?.Inject(instance);
             valueInjector?.Inject(instance);
-
-            //_instanceMap.Add(type, new SingletonServiceInstance(instance) { LookupType = type, ServiceType = type}.AddServices(this));
 
             return this;
         }
@@ -302,32 +299,39 @@ namespace Rigger.Injection
                 
                 Console.WriteLine($"- Added instance from Factory {i}");
             }
-            
-            desc?.AllTypes()?.ForEach(o =>
+
+            if (desc.Singletons.Any())
             {
-                try
+                Console.WriteLine("Singletons");
+            }
+
+            desc?.AllTypes()?.ForEach(o =>
                 {
-                    if (o.IsInterface)
+                    try
                     {
-                        return;
+                        if (o.IsInterface)
+                        {
+                            return;
+                        }
+
+                        // create an instance activator for all types if one doesn't exist
+                        var instance = _instanceMap.GetOrPut(o, () => GetServiceInstance(desc, type, o));
+
+                        // add it to the list using the method accessor
+                        var i = instance?.Get();
+
+                        mi.Invoke(list, instance?.Get());
+
+                        //    Console.WriteLine($"- Added instance from ServiceInstance {i}");
+
                     }
+                    catch (Exception)
+                    {
+                    }
+                });
+            //}
 
-                    // create an instance activator for all types if one doesn't exist
-                    var instance = _instanceMap.GetOrPut(o, () => GetServiceInstance(desc, type, o));
-
-                    // add it to the list using the method accessor
-                    var i = instance?.Get();
-
-                    mi.Invoke(list, instance?.Get());
-
-                //    Console.WriteLine($"- Added instance from ServiceInstance {i}");
-                
-                } catch (Exception)
-                {
-                }
-            });
-
-            desc?.Singletons.ForEach(o => mi.Invoke(list, o));
+            desc?.Singletons?.ForEach(o => mi.Invoke(list, o));
 
             return list;
         }
@@ -387,6 +391,10 @@ namespace Rigger.Injection
 
             if (desc != null)
             {
+                if (desc.LifeCycle == ServiceLifecycle.Scoped)
+                {
+                    Console.WriteLine("Got scoped service");
+                }
                 object newInstance = null;
 
                 if (desc.Factory != null)
@@ -414,7 +422,6 @@ namespace Rigger.Injection
 
                 return newInstance;
             }
-
             return null;
         }
 
@@ -452,11 +459,9 @@ namespace Rigger.Injection
 
                 _instanceMap.Values.ForEach(i =>
                 {
-                    // the instance map may hold a reference to this object
-                    // ignore it if it does.
-                    if (i is IDisposable d)
+                    if (!i.Is(this))
                     {
-                        d.Dispose();
+                        i.Dispose();
                     }
                 });
 
