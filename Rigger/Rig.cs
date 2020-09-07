@@ -166,6 +166,7 @@ namespace Rigger {
 
             Services = new Services();
 
+            Services.Add<IServiceProvider>(this);
             // bootstrap by adding the module
 
             Services

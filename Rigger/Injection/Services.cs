@@ -88,13 +88,27 @@ namespace Rigger.Injection
 
         public IServices Add(Type type, object instance)
         {
+            if (_descriptionMap.ContainsKey(type))
+            {
+
+                var sd = _descriptionMap[type];
+                
+                sd.ExtraInstances.Add(instance);
+
+             
+
+                return this;
+            }
+
             _descriptionMap.Add(type, new ServiceDescription
             {
                 ServiceType = type,
                 ImplementationType = instance.GetType(),
-                LifeCycle = ServiceLifecycle.Singleton
+                LifeCycle = ServiceLifecycle.Singleton,
+                ExtraInstances = new List<object>() { instance }
             });
-            _instanceMap.Add(type, new SingletonServiceInstance(instance) { LookupType = type, ServiceType = type}.AddServices(this));
+
+            //_instanceMap.Add(type, new SingletonServiceInstance(instance) { LookupType = type, ServiceType = type}.AddServices(this));
 
             return this;
         }
@@ -188,7 +202,7 @@ namespace Rigger.Injection
         /// <returns>An instance of type T</returns>
         public T GetService<T>()
             where T : class
-        {
+        { 
             return (T) GetService(typeof(T));
         }
 
@@ -220,30 +234,69 @@ namespace Rigger.Injection
         /// <returns></returns>
         internal object GetEnumerable(Type serviceType)
         {
+            
+
             var type = serviceType.GetGenericArguments().FirstOrDefault();
+
+            Console.WriteLine($"Getting enumerable for {type}");
 
             if (type == null)
             {
                 return null;
             }
 
+          
             var activator = new ExpressionActivator(typeof(List<>).MakeGenericType(type));
 
             var list = activator.Activate();
 
+            if (!_descriptionMap.ContainsKey(type))
+            {
+                Console.WriteLine($"Could not find any registered types for {type.Name} {type.GenericTypeArguments}");
+                return list;
+            }
+
             var mi = new SingleParameterMethodAccessor(list.GetType(), "Add");
 
             var desc = _descriptionMap[type];
+
+            if (desc.Factory != null)
+            {
+                object i = desc.Factory(this);
+
+                mi.Invoke(list, i);
+                
+                Console.WriteLine($"- Added instance from Factory {i}");
+            }
             
             desc?.AllTypes()?.ForEach(o =>
             {
-                // create an instance activator for all types if one doesn't exist
-                var instance = _instanceMap.GetOrPut(o, () => GetServiceInstance(desc, o, o));
-                
-                // add it to the list using the method accessor
+                try
+                {
+                    if (o.IsInterface)
+                    {
+                        return;
+                    }
 
-                mi.Invoke(list, instance?.Get());
+                    // create an instance activator for all types if one doesn't exist
+                    var instance = _instanceMap.GetOrPut(o, () => GetServiceInstance(desc, type, o));
+
+                    // add it to the list using the method accessor
+                    var i = instance?.Get();
+
+                    mi.Invoke(list, instance?.Get());
+
+                //    Console.WriteLine($"- Added instance from ServiceInstance {i}");
+                
+                } catch (Exception)
+                {
+                }
             });
+
+            desc?.ExtraInstances.ForEach(o => mi.Invoke(list, o));
+
+
+            Console.WriteLine($"Returning for {serviceType.Name}");
 
             return list;
         }
@@ -289,18 +342,27 @@ namespace Rigger.Injection
 
                 _descriptionMap.TryGetValue(serviceType, out var desc);
 
-
-
                 if (desc != null)
                 {
+                    object newInstance = null;
+
                     if (desc.Factory != null)
                         return desc.Factory(this);
 
-                    IServiceInstance instance = GetServiceInstance(desc,serviceType);
+                    if (desc.ExtraInstances.Count > 0)
+                    {
+                        newInstance = desc.ExtraInstances.First();
+                    }
+                    else
+                    {
 
-                    _instanceMap.Add(serviceType, instance);
+                        IServiceInstance instance = GetServiceInstance(desc, serviceType);
 
-                    var newInstance = instance.Get();
+                        _instanceMap.Add(serviceType, instance);
+                        newInstance = instance.Get();
+                    }
+
+
                     if (newInstance is IServiceAware svc && svc.Services == null)
                     {
                         svc.AddServices(this);
@@ -313,7 +375,15 @@ namespace Rigger.Injection
 
             // has an instance already.
 
+
+           // Console.WriteLine($"Get existing instance: {serviceType}");
+
             var i = service?.Get();
+            
+            /*if (i == null)
+            {
+                Console.WriteLine($"Could not get instance for {serviceType}");
+            }*/
 
             // if the instance is service aware, inject the services
             if (i is IServiceAware sa && sa.Services == null)
@@ -360,12 +430,9 @@ namespace Rigger.Injection
                 {
                     // the instance map may hold a reference to this object
                     // ignore it if it does.
-                    if (i.Get() != this)
+                    if (i is IDisposable d)
                     {
-                        if (i is IDisposable d)
-                        {
-                            d.Dispose();
-                        }
+                        d.Dispose();
                     }
                 });
 
@@ -394,5 +461,14 @@ namespace Rigger.Injection
             _instanceMap.Clear();
         }
 
+        public bool IsManaged(Type type)
+        {
+            return _descriptionMap.ContainsKey(type);
+        }
+
+        public bool IsManaged<T>()
+        {
+            return _descriptionMap.ContainsKey(typeof(T));
+        }
     }
 }

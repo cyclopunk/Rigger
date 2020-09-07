@@ -167,9 +167,9 @@ namespace Rigger.ManagedTypes.Implementations
                 {
                     if (o.ParameterType.IsGenericType && o.ParameterType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                     {
-                        return Services.GetService(o.ParameterType.GetGenericArguments().First()) != null;
+                        return Services.IsManaged(o.ParameterType.GetGenericArguments().First());
                     }
-                    return Services.GetService(o.ParameterType) != null;
+                    return Services.IsManaged(o.ParameterType);
                 });
         }
     }
