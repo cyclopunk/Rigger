@@ -93,9 +93,7 @@ namespace Rigger.Injection
 
                 var sd = _descriptionMap[type];
                 
-                sd.ExtraInstances.Add(instance);
-
-             
+                sd.Singletons.Add(instance);
 
                 return this;
             }
@@ -105,8 +103,14 @@ namespace Rigger.Injection
                 ServiceType = type,
                 ImplementationType = instance.GetType(),
                 LifeCycle = ServiceLifecycle.Singleton,
-                ExtraInstances = new List<object>() { instance }
+                Singletons = new List<object>() { instance }
             });
+
+            IAutowirer autowirer = GetService<IAutowirer>();
+            IValueInjector valueInjector = GetService<IValueInjector>();
+
+            autowirer?.Inject(instance);
+            valueInjector?.Inject(instance);
 
             //_instanceMap.Add(type, new SingletonServiceInstance(instance) { LookupType = type, ServiceType = type}.AddServices(this));
 
@@ -239,8 +243,6 @@ namespace Rigger.Injection
         /// <returns></returns>
         internal object GetEnumerable(Type serviceType)
         {
-            
-
             var type = serviceType.GetGenericArguments().FirstOrDefault();
 
             Console.WriteLine($"Getting enumerable for {type}");
@@ -298,10 +300,7 @@ namespace Rigger.Injection
                 }
             });
 
-            desc?.ExtraInstances.ForEach(o => mi.Invoke(list, o));
-
-
-            Console.WriteLine($"Returning for {serviceType.Name}");
+            desc?.Singletons.ForEach(o => mi.Invoke(list, o));
 
             return list;
         }
@@ -320,83 +319,75 @@ namespace Rigger.Injection
                 return GetEnumerable(serviceType);
             }
 
-            if (service == null)
+            if (service != null)
             {
-                // Deal with a type that we have an open generic
-                // description of (like ILogger<>)
-                if (serviceType.IsConstructedGenericType 
-                    && !_descriptionMap.ContainsKey(serviceType))
-                {
-                    var generic = serviceType.GetGenericTypeDefinition();
-                    
-                    _descriptionMap.TryGetValue(generic, out var openType);
-
-                    if (openType != null)
-                    {
-                        var makeType = openType.ImplementationType.MakeGenericType(serviceType.GetGenericArguments());
-
-                        // cache constructed type
-
-                        Add(serviceType, makeType, openType.LifeCycle);
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-
-                _descriptionMap.TryGetValue(serviceType, out var desc);
-
-                if (desc != null)
-                {
-                    object newInstance = null;
-
-                    if (desc.Factory != null)
-                        return desc.Factory(this);
-
-                    if (desc.ExtraInstances.Count > 0)
-                    {
-                        newInstance = desc.ExtraInstances.First();
-                    }
-                    else
-                    {
-
-                        IServiceInstance instance = GetServiceInstance(desc, serviceType);
-
-                        _instanceMap.Add(serviceType, instance);
-                        newInstance = instance.Get();
-                    }
-
-
-                    if (newInstance is IServiceAware svc && svc.Services == null)
-                    {
-                        svc.AddServices(this);
-                    }
-
-
-                    return newInstance;
-                }
-            }
-
-            // has an instance already.
-
-
-           // Console.WriteLine($"Get existing instance: {serviceType}");
-
-            var i = service?.Get();
+                var i = service?.Get();
             
-            /*if (i == null)
-            {
-                Console.WriteLine($"Could not get instance for {serviceType}");
-            }*/
+                // if the instance is service aware, inject the services
+                if (i is IServiceAware sa && sa.Services == null)
+                {
+                    sa.AddServices(this);
+                }
 
-            // if the instance is service aware, inject the services
-            if (i is IServiceAware sa && sa.Services == null)
+                return  i;
+            } 
+
+            // Deal with a type that we have an open generic
+            // description of (like ILogger<>)
+            if (serviceType.IsConstructedGenericType 
+                && !_descriptionMap.ContainsKey(serviceType))
             {
-                sa.AddServices(this);
+                var generic = serviceType.GetGenericTypeDefinition();
+                
+                _descriptionMap.TryGetValue(generic, out var openType);
+
+                if (openType != null)
+                {
+                    var makeType = openType.ImplementationType.MakeGenericType(serviceType.GetGenericArguments());
+
+                    // cache constructed type for easy lookup later
+
+                    Add(serviceType, makeType, openType.LifeCycle);
+                }
+                else
+                {
+                    return null;
+                }
             }
 
-            return  i;
+            _descriptionMap.TryGetValue(serviceType, out var desc);
+
+            if (desc != null)
+            {
+                object newInstance = null;
+
+                if (desc.Factory != null)
+                    return desc.Factory(this);
+
+                if (desc.Singletons.Count > 0)
+                {
+                    newInstance = desc.Singletons.First();
+                }
+                else
+                {
+
+                    IServiceInstance instance = GetServiceInstance(desc, serviceType);
+
+                    _instanceMap.Add(serviceType, instance);
+                    newInstance = instance.Get();
+                }
+
+
+                if (newInstance is IServiceAware svc && svc.Services == null)
+                {
+                    svc.AddServices(this);
+                }
+
+
+                return newInstance;
+            }
+
+            return null;
         }
 
         /// <summary>

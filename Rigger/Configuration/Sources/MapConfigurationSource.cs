@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace Rigger.Configuration.Sources
 {
+    /// <summary>
+    /// Simple map based configuration source.
+    /// </summary>
     public class MapConfigurationSource : IConfigurationSource
     {
         public int Priority { get; set; } = 100;

@@ -10,10 +10,10 @@ using System.Text;
 
 namespace Rigger.Core
 {
-    public class ServiceProviderBuilder
+    public class RiggedServiceProviderBuilder
     {
-        IServiceCollection services;
-        public ServiceProviderBuilder(IServiceCollection services)
+        private readonly IServiceCollection services;
+        public RiggedServiceProviderBuilder(IServiceCollection services)
         {
             this.services = services;
         }

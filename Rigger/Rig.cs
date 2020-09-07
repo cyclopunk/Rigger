@@ -8,9 +8,11 @@ using Microsoft.Extensions.Logging;
 using Rigger.Extensions;
 using Rigger.ManagedTypes.ComponentHandlers;
 using Rigger.Attributes;
+using Rigger.Exceptions;
 using Rigger.Injection;
 using Rigger.ManagedTypes;
 using Rigger.ManagedTypes.ComponentScanners;
+using Rigger.Reflection;
 
 namespace Rigger {
     /// <summary>
@@ -26,6 +28,9 @@ namespace Rigger {
    {
 
        private static string PLUGIN_NAMESPACE = "Drone";
+
+       private ILogger<Rig> logger;
+       private IEventRegistry eventRegistry;
 
        public IServices Services { get; set; }
 
@@ -43,7 +48,7 @@ namespace Rigger {
        {
            Services.Add(type, instance);
 
-           Services.GetService<IEventRegistry>()?.Register(instance);
+           eventRegistry?.Register(instance);
 
            return this;
        }
@@ -52,7 +57,7 @@ namespace Rigger {
        {
            Services.Add<TType>(instance);
 
-           Services.GetService<IEventRegistry>()?.Register(instance);
+           eventRegistry?.Register(instance);
 
            return this;
        }
@@ -71,6 +76,12 @@ namespace Rigger {
             return this;
         }
 
+       /// <summary>
+       /// Register a service and return an instance of that service.
+       /// </summary>
+       /// <typeparam name="TManagedType"></typeparam>
+       /// <param name="constructorParams"></param>
+       /// <returns></returns>
         public TManagedType RegisterAndGet<TManagedType>(params object[] constructorParams) where TManagedType : class
        {
            return Services.Add<TManagedType, TManagedType>().GetService<TManagedType>();
@@ -78,6 +89,10 @@ namespace Rigger {
 
        public bool IsBuilt { get; protected set; }
         
+       /// <summary>
+       /// This method will return the default assemblies.
+       /// </summary>
+       /// <returns></returns>
        private Assembly[] DefaultAssemblies()
        {
            var executingAssembly = Assembly.GetExecutingAssembly();
@@ -87,7 +102,7 @@ namespace Rigger {
            autoScannedAssemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies()
                .FindAll(o => o.FullName.Contains(PLUGIN_NAMESPACE)));
 
-           autoScannedAssemblies.Add(this.GetType().Assembly);
+           autoScannedAssemblies.Add(GetType().Assembly);
            // ServiceLifecycle attributes from Traits
            autoScannedAssemblies.Add(typeof(ILifecycle).Assembly);
 
@@ -106,34 +121,28 @@ namespace Rigger {
 
        /// <summary>
        /// Since assemblies are not added right away we have to load
-       /// them from the app domain directory. We'll only load the ones matching the namespace string though.
+       /// them from the app domain directory.
+       ///
+       /// This method will load the ones matching the namespace string.
        /// </summary>
-       /// <param name="namespaceString"></param>
-       private void AddDynamicAssemblies(string namespaceString)
+       /// <param name="namespaceString">The namespace string to match.</param>
+       private Assembly[] AddDynamicAssemblies(string namespaceString)
        {
            var path = AppDomain.CurrentDomain.BaseDirectory;
-
-           //logger.LogInformation($"Searching app directory {path} for DLLs starting with " + namespaceString);
 
            Directory.GetFiles(path, "*.dll")
                .Where(o =>
                {
                    var filename = Path.GetFileName(o);
 
-                   //logger.LogInformation($"Found {filename} from {o}");
-
                    return  filename.StartsWith(namespaceString);
                })
                .ForEach(o =>
                {
-                   //logger.LogInformation($"Loading assembly.");
                    Assembly.LoadFrom(o);
                });
 
-           var domain = AppDomain.CurrentDomain.GetAssemblies();
-
-           //logger.LogInformation($"Domain assemblies: {string.Join(",",domain.Select(o => o.FullName))})");
-
+          return AppDomain.CurrentDomain.GetAssemblies();
        }
 
        /// <summary>
@@ -152,13 +161,14 @@ namespace Rigger {
 
        public Rig(string namespaceString)
        {
-           //logger.LogInformation($"Searching domain {namespaceString} for Forge artifacts.");
+           Console.WriteLine($"Searching domain {namespaceString} for Drones.");
+
            Build(DefaultAssemblies().Concat(SearchAppDomain(namespaceString)).ToArray()); 
        }
 
        /// <summary>
-        /// Build the application container from the assembly. This will initialize the default context, scan the assembly and then validate
-        /// that the application is complete.
+        /// Build the application container from the assembly. This will find all modules, run all component scanners that have been discovered
+        /// and initialize the event registry.
         /// </summary>
         /// <param name="assemblies">The assemblies that will be used to build the application.</param>
         public void Build(params Assembly[] assemblies)
@@ -174,9 +184,19 @@ namespace Rigger {
                 .GetService<ModuleComponentScanner>()
                 .ComponentScan(assemblies);
 
-            var logger = Services.GetService<ILogger<Rig>>();
+            logger = Services.GetService<ILogger<Rig>>();
+
+            if (logger == null)
+            {
+                throw new Exception("No ILogger<> registered, please register an ILogger with the container as it is a guaranteed service.");
+            }
             
-            var scanners = Services.GetService<IEnumerable<IComponentScanner>>();
+            var scanners = Services.GetService<IEnumerable<IComponentScanner>>().ToList();
+
+            if (!scanners.Any())
+            {
+                throw new ContainerException("No component scanners identified, that most likely means the Default Module was not found. Install the Drone.Bootstrap nuget package to continue, or build your own module.");
+            }
 
             scanners.ForEach(o =>
             {
@@ -190,6 +210,25 @@ namespace Rigger {
                     throw;
                 }
             });
+
+            eventRegistry = Services.GetService<IEventRegistry>();
+
+            if (eventRegistry == null)
+            {
+                logger.LogWarning("No event registry found, the Application Event Pipeline will not be available for this application.");
+            }
+
+            // other basic checks
+
+            if (!Services.IsManaged<IConstructorActivator>())
+            {
+                logger.LogWarning("An IConstructorActivator was not found, object construction will be slower without one.");
+            }
+
+            if (!Services.IsManaged<IAutowirer>())
+            {
+                logger.LogWarning("An autowirerer was not found, Autowiring services will not be available for this application.");
+            }
 
             IsBuilt = true;
         }

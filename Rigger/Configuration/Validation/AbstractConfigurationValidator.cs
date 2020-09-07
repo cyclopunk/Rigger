@@ -3,9 +3,10 @@ using System.Linq;
 
 namespace Rigger.Configuration.Validation
 {
-    /**
-     * Abstract class for default configuration validators.
-     */
+  
+    /// <summary>
+    /// Configuration Validator abstract class.
+    /// </summary>
     public abstract class AbstractConfigurationValidator : IConfigurationValidator
     {
         public virtual bool IsValid(params IConfigurationSource[] sources)

@@ -7,6 +7,7 @@ namespace Rigger.Configuration
     /// <summary>
     /// Interface for a configuration service. Configuration services will load configuration values from
     /// different sources and provide them through the Get method.
+    ///
     /// </summary>
     public interface IConfigurationService
     {

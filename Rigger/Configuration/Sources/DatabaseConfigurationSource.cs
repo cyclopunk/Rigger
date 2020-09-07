@@ -4,6 +4,9 @@ using Rigger.Extensions;
 
 namespace Rigger.Configuration.Sources
 {
+    /// <summary>
+    /// Source for a database configuration entity.
+    /// </summary>
     public class DatabaseConfigurationSource : IConfigurationSource
     {
         private ConfigurationEntityContext configurationContext;
