@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Rigger.Core
 {
-    class ServiceProviderBuilder
+    public class ServiceProviderBuilder
     {
         IServiceCollection services;
         public ServiceProviderBuilder(IServiceCollection services)

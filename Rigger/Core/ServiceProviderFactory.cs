@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Rigger.Core
 {
-    class ServiceProviderFactory : IServiceProviderFactory<ServiceProviderBuilder>
+    public class ServiceProviderFactory : IServiceProviderFactory<ServiceProviderBuilder>
     {
         public ServiceProviderBuilder CreateBuilder(IServiceCollection services)
         {
