@@ -25,6 +25,7 @@ namespace Rigger.Configuration
         /// Fetch the configuration from all of the sources. This has the side-effect of clearing out
         /// all of the configuration values.
         /// </summary>
+        [OnCreate]
         public void FetchConfiguration()
         {
             // clear the current configuration

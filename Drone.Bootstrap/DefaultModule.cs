@@ -41,9 +41,9 @@ namespace Drone.Bootstrap
                 .Add<IValueConverter<string, double>, StringToDoubleConverter>()
                 .Add<IValueConverter<string, long>, StringToLongConverter>()
                 .Add<IValueConverter<string, object>, JsonValueConverter<object>>()
-                .Add<IConfigurationService>(new DefaultConfigurationService()
-                       .AddSource(new EnvironmentConfigurationSource())
-                       .AddSource(new AppSettingsConfigurationSource())) // default config
+                .Add<IConfigurationService, DefaultConfigurationService>(ServiceLifecycle.Singleton)
+                .Add<IConfigurationSource, EnvironmentConfigurationSource>(ServiceLifecycle.Singleton)
+                .Add<IConfigurationSource, AppSettingsConfigurationSource>(ServiceLifecycle.Singleton)// default config
                 .Add<IValueInjector, DefaultValueInjector>()
                 .Add(typeof(ILogger<>), typeof(Logger<>)) // logging
                 .Add<IServiceScopeFactory, ServiceScopeFactory>(); // scoped support

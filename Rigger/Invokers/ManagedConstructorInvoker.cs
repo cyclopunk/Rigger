@@ -121,7 +121,7 @@ namespace Rigger.ManagedTypes.Implementations
                     {
                         ValueAttribute v = m.GetCustomAttribute<ValueAttribute>();
                         // if it's a value, get it from the configuration service, if it's not, use the container to look it up.
-                        if (v != null) return Services.GetService<IConfigurationService>().Get(v.Key);
+                        if (v != null && Services.IsManaged<IConfigurationService>()) return Services.GetService<IConfigurationService>().Get(v.Key);
 
                         var lookedUpObject = Services.GetService(m.ParameterType);
 

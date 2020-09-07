@@ -6,6 +6,7 @@ using Rigger.ValueConverters;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -64,6 +65,17 @@ namespace Rigger.Injection.Defaults
             if (!PropertyCache.ContainsKey(type))
             {
                 CacheType(type);
+            }
+
+            if (!Services.IsManaged<IConfigurationService>())
+            {
+                return obj;
+            }
+
+            // no values, return early.
+            if (!PropertyCache.ContainsKey(type) && !FieldCache.ContainsKey(type))
+            {
+                return obj;
             }
 
             var config = Services.GetService<IConfigurationService>();
