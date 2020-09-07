@@ -14,6 +14,7 @@ namespace Rigger.Injection
         public ServiceLifecycle LifeCycle { get; set; }
 
         public List<Type> ExtraTypes = new List<Type>();
+        public List<object> Singletons = new List<object>();
 
         public IEnumerable<Type> AllTypes()
         {

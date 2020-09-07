@@ -1,3 +1,5 @@
+![Test Rigger Application](https://github.com/cyclopunk/Rigger/workflows/Test%20Rigger%20Application/badge.svg)
+
 # Rigger
 
 Rigger is a framework for dependency injection, inversion of control and container-managed instances. It is a part of a greater project I'm working on. It is being developed to address some feature gaps in common C# DI frameworks. Some may notice that it is very Spring Boot-esq and that is intentional. It is the hope that this platform can be used to quickly build projects with advanced features. 
@@ -27,20 +29,15 @@ Rigger is also a drop-in replacement for IServiceProvider for dotnetcore project
 
 ### TODO 
 I recently refactored this from another project, so there's a lot to do before I can consider this "stable".
-- Update Docs
-- Reintegrate Events
-- Reintegrate Lifecycle management
+
 - Reintegrate Conditional Services
-- More benchmarks
-- Convert modules to Rigger Drone framework
-- Scoped DI needs tests (and is probably broken)
 
 
 ## Quickstart
 
 To create a Rigged application, it is as simple as inheriting from the Rig class. Merely instantiating that class, or inheriting from it, will trigger
 the configuration of the application. This will start the component scanning part of the framework and it will discover all components
-that are marked with a Managed Type attribute. You can pass in additional assemblies to the ApplicationContainer constructor in order to 
+that are marked with a Managed Type attribute. You can pass in additional assemblies or namespace strings to the Rig constructor in order to 
 include other Assemblies in your application. This will allow a plugin type style of development.
                         
 ### Singleton

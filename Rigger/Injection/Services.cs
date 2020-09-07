@@ -88,13 +88,31 @@ namespace Rigger.Injection
 
         public IServices Add(Type type, object instance)
         {
+            if (_descriptionMap.ContainsKey(type))
+            {
+
+                var sd = _descriptionMap[type];
+                
+                sd.Singletons.Add(instance);
+
+                return this;
+            }
+
             _descriptionMap.Add(type, new ServiceDescription
             {
                 ServiceType = type,
                 ImplementationType = instance.GetType(),
-                LifeCycle = ServiceLifecycle.Singleton
+                LifeCycle = ServiceLifecycle.Singleton,
+                Singletons = new List<object>() { instance }
             });
-            _instanceMap.Add(type, new SingletonServiceInstance(instance) { LookupType = type, ServiceType = type}.AddServices(this));
+
+            IAutowirer autowirer = GetService<IAutowirer>();
+            IValueInjector valueInjector = GetService<IValueInjector>();
+
+            autowirer?.Inject(instance);
+            valueInjector?.Inject(instance);
+
+            //_instanceMap.Add(type, new SingletonServiceInstance(instance) { LookupType = type, ServiceType = type}.AddServices(this));
 
             return this;
         }
@@ -107,6 +125,11 @@ namespace Rigger.Injection
         /// <returns></returns>
         public IServices Add(Type lookupType, Func<IServices, object> factory, ServiceLifecycle lifecycle = ServiceLifecycle.Singleton)
         {
+            if (_descriptionMap.ContainsKey(lookupType))
+            {
+                Console.WriteLine($"Removing old service description {_descriptionMap[lookupType]}, replacing with factory.");
+                Remove(lookupType);
+            }
             _descriptionMap.Add(lookupType, new ServiceDescription
             {
                 ServiceType = lookupType,
@@ -188,7 +211,7 @@ namespace Rigger.Injection
         /// <returns>An instance of type T</returns>
         public T GetService<T>()
             where T : class
-        {
+        { 
             return (T) GetService(typeof(T));
         }
 
@@ -222,28 +245,62 @@ namespace Rigger.Injection
         {
             var type = serviceType.GetGenericArguments().FirstOrDefault();
 
+            Console.WriteLine($"Getting enumerable for {type}");
+
             if (type == null)
             {
                 return null;
             }
 
+          
             var activator = new ExpressionActivator(typeof(List<>).MakeGenericType(type));
 
             var list = activator.Activate();
 
+            if (!_descriptionMap.ContainsKey(type))
+            {
+                Console.WriteLine($"Could not find any registered types for {type.Name} {type.GenericTypeArguments}");
+                return list;
+            }
+
             var mi = new SingleParameterMethodAccessor(list.GetType(), "Add");
 
             var desc = _descriptionMap[type];
+
+            if (desc.Factory != null)
+            {
+                object i = desc.Factory(this);
+
+                mi.Invoke(list, i);
+                
+                Console.WriteLine($"- Added instance from Factory {i}");
+            }
             
             desc?.AllTypes()?.ForEach(o =>
             {
-                // create an instance activator for all types if one doesn't exist
-                var instance = _instanceMap.GetOrPut(o, () => GetServiceInstance(desc, o, o));
-                
-                // add it to the list using the method accessor
+                try
+                {
+                    if (o.IsInterface)
+                    {
+                        return;
+                    }
 
-                mi.Invoke(list, instance?.Get());
+                    // create an instance activator for all types if one doesn't exist
+                    var instance = _instanceMap.GetOrPut(o, () => GetServiceInstance(desc, type, o));
+
+                    // add it to the list using the method accessor
+                    var i = instance?.Get();
+
+                    mi.Invoke(list, instance?.Get());
+
+                //    Console.WriteLine($"- Added instance from ServiceInstance {i}");
+                
+                } catch (Exception)
+                {
+                }
             });
+
+            desc?.Singletons.ForEach(o => mi.Invoke(list, o));
 
             return list;
         }
@@ -262,66 +319,75 @@ namespace Rigger.Injection
                 return GetEnumerable(serviceType);
             }
 
-            if (service == null)
+            if (service != null)
             {
-                // Deal with a type that we have an open generic
-                // description of (like ILogger<>)
-                if (serviceType.IsConstructedGenericType 
-                    && !_descriptionMap.ContainsKey(serviceType))
+                var i = service?.Get();
+            
+                // if the instance is service aware, inject the services
+                if (i is IServiceAware sa && sa.Services == null)
                 {
-                    var generic = serviceType.GetGenericTypeDefinition();
-                    
-                    _descriptionMap.TryGetValue(generic, out var openType);
-
-                    if (openType != null)
-                    {
-                        var makeType = openType.ImplementationType.MakeGenericType(serviceType.GetGenericArguments());
-
-                        // cache constructed type
-
-                        Add(serviceType, makeType, openType.LifeCycle);
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    sa.AddServices(this);
                 }
 
-                _descriptionMap.TryGetValue(serviceType, out var desc);
+                return  i;
+            } 
 
+            // Deal with a type that we have an open generic
+            // description of (like ILogger<>)
+            if (serviceType.IsConstructedGenericType 
+                && !_descriptionMap.ContainsKey(serviceType))
+            {
+                var generic = serviceType.GetGenericTypeDefinition();
+                
+                _descriptionMap.TryGetValue(generic, out var openType);
 
-
-                if (desc != null)
+                if (openType != null)
                 {
-                    if (desc.Factory != null)
-                        return desc.Factory(this);
+                    var makeType = openType.ImplementationType.MakeGenericType(serviceType.GetGenericArguments());
 
-                    IServiceInstance instance = GetServiceInstance(desc,serviceType);
+                    // cache constructed type for easy lookup later
+
+                    Add(serviceType, makeType, openType.LifeCycle);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            _descriptionMap.TryGetValue(serviceType, out var desc);
+
+            if (desc != null)
+            {
+                object newInstance = null;
+
+                if (desc.Factory != null)
+                    return desc.Factory(this);
+
+                if (desc.Singletons.Count > 0)
+                {
+                    newInstance = desc.Singletons.First();
+                }
+                else
+                {
+
+                    IServiceInstance instance = GetServiceInstance(desc, serviceType);
 
                     _instanceMap.Add(serviceType, instance);
-
-                    var newInstance = instance.Get();
-                    if (newInstance is IServiceAware svc && svc.Services == null)
-                    {
-                        svc.AddServices(this);
-                    }
-
-
-                    return newInstance;
+                    newInstance = instance.Get();
                 }
+
+
+                if (newInstance is IServiceAware svc && svc.Services == null)
+                {
+                    svc.AddServices(this);
+                }
+
+
+                return newInstance;
             }
 
-            // has an instance already.
-
-            var i = service?.Get();
-
-            // if the instance is service aware, inject the services
-            if (i is IServiceAware sa && sa.Services == null)
-            {
-                sa.AddServices(this);
-            }
-
-            return  i;
+            return null;
         }
 
         /// <summary>
@@ -360,12 +426,9 @@ namespace Rigger.Injection
                 {
                     // the instance map may hold a reference to this object
                     // ignore it if it does.
-                    if (i.Get() != this)
+                    if (i is IDisposable d)
                     {
-                        if (i is IDisposable d)
-                        {
-                            d.Dispose();
-                        }
+                        d.Dispose();
                     }
                 });
 
@@ -394,5 +457,14 @@ namespace Rigger.Injection
             _instanceMap.Clear();
         }
 
+        public bool IsManaged(Type type)
+        {
+            return _descriptionMap.ContainsKey(type);
+        }
+
+        public bool IsManaged<T>()
+        {
+            return _descriptionMap.ContainsKey(typeof(T));
+        }
     }
 }

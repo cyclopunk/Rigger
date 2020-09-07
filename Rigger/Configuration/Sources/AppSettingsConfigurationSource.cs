@@ -8,6 +8,10 @@ using Rigger.Extensions;
 
 namespace Rigger.Configuration.Sources
 {
+    /// <summary>
+    /// DotNet Core / ASP.NET AppSettings source for the Rigger Configuration Service.
+    /// 
+    /// </summary>
     public class AppSettingsConfigurationSource : IConfigurationSource
     {
         public static string DEFAULT_APP_SETTINGS_FILENAME = "appsettings.json";

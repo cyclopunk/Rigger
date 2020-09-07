@@ -16,17 +16,26 @@ namespace Rigger.Injection.Defaults
     {
         public IServices Services { get; set; }
 
-        private static ConcurrentDictionary<Type, ConcurrentBag<ExpressionPropertyAccessor>> _cache =
+        /// <summary>
+        /// Thread safe caches for expression types.
+        /// </summary>
+        private static readonly ConcurrentDictionary<Type, ConcurrentBag<ExpressionPropertyAccessor>> PropertyCache =
             new ConcurrentDictionary<Type, ConcurrentBag<ExpressionPropertyAccessor>>();
-        private static ConcurrentDictionary<Type, ConcurrentBag<ExpressionFieldAccessor>> _fieldCache =
+        private static readonly ConcurrentDictionary<Type, ConcurrentBag<ExpressionFieldAccessor>> FieldCache =
             new ConcurrentDictionary<Type, ConcurrentBag<ExpressionFieldAccessor>>();
       
-        public void CacheType(Type type)
+        /// <summary>
+        /// This method will cache the expression accessors for all of the types that are
+        /// passed into this value injector. This should speed up the value injection for a
+        /// small amount of memory cost.
+        /// </summary>
+        /// <param name="type"></param>
+        private void CacheType(Type type)
         {
             type.PropertyWithAttribute<ValueAttribute>().ForEach(property =>
             {
                 var accessor = new ExpressionPropertyAccessor(property);
-                _cache.AddOrUpdate(type, new ConcurrentBag<ExpressionPropertyAccessor> { accessor }, (key, value) =>
+                PropertyCache.AddOrUpdate(type, new ConcurrentBag<ExpressionPropertyAccessor> { accessor }, (key, value) =>
                 {
                     value.Add(accessor);
                     return value;
@@ -39,7 +48,7 @@ namespace Rigger.Injection.Defaults
                 {
                     var accessor = new ExpressionFieldAccessor(field);
 
-                    _fieldCache.AddOrUpdate(type, new ConcurrentBag<ExpressionFieldAccessor> { accessor }, (key, value) =>
+                    FieldCache.AddOrUpdate(type, new ConcurrentBag<ExpressionFieldAccessor> { accessor }, (key, value) =>
                     {
                         value.Add(accessor);
                         return value;
@@ -52,44 +61,41 @@ namespace Rigger.Injection.Defaults
 
             if (obj == null) throw new ArgumentNullException(nameof(obj));
 
-            if (!_cache.ContainsKey(type))
+            if (!PropertyCache.ContainsKey(type))
             {
                 CacheType(type);
             }
 
             var config = Services.GetService<IConfigurationService>();
            
-            if (_cache.ContainsKey(type))
-                _cache[type].ForEach(info => {
+            if (PropertyCache.ContainsKey(type))
+                PropertyCache[type].ForEach(info => {
                     ValueAttribute v = info.Property.GetCustomAttribute<ValueAttribute>();
 
                     var value = config.Get(v.Key ?? info.Property.Name, info.GetValue(obj));
 
-                    // convert if possible, might be better using a ConvertExpression here?
-
                     if (value.GetType() != info.PropertyType)
                     {
-                        Type valueConverterType = typeof(IValueConverter<,>);
+                        var valueConverterType = typeof(IValueConverter<,>);
 
-                        IValueConverter converter = (IValueConverter)Services.GetService(valueConverterType.MakeGenericType(value.GetType(), info.PropertyType));
+                        var converter = (IValueConverter)Services.GetService(valueConverterType.MakeGenericType(value.GetType(), info.PropertyType));
 
                         value = converter.Convert(value);
                     }
+
                     info.SetValue(obj, value);
                  });
-            if (_fieldCache.ContainsKey(type))
-                _fieldCache[type].ForEach(info => {
+            if (FieldCache.ContainsKey(type))
+                FieldCache[type].ForEach(info => {
                     ValueAttribute v = info.Field.GetCustomAttribute<ValueAttribute>();
 
                     var value = config.Get(v.Key ?? info.Field.Name, info.GetValue(obj));
 
-                    // convert if possible, might be better using a ConvertExpression here?
-
                     if (value.GetType() != info.FieldType)
                     {
-                        Type valueConverterType = typeof(IValueConverter<,>);
+                        var valueConverterType = typeof(IValueConverter<,>);
 
-                        IValueConverter converter = (IValueConverter)Services.GetService(valueConverterType.MakeGenericType(value.GetType(), info.FieldType));
+                        var converter = (IValueConverter)Services.GetService(valueConverterType.MakeGenericType(value.GetType(), info.FieldType));
 
                         value = converter.Convert(value);
                     }

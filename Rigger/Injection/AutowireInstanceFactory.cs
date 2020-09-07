@@ -46,6 +46,11 @@ namespace Rigger.Injection
 
             instance = invoker?.Construct(type, new object[] {});
 
+            if (instance == null)
+            {
+                return null;
+            }
+
             autowire?.Inject(instance);
             valueInjector?.Inject(instance);
 

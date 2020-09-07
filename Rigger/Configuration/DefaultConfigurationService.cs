@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Rigger.Configuration;
+using Rigger.Attributes;
+using Rigger.Configuration.Validation;
 using Rigger.Extensions;
 
 namespace Rigger.Configuration
@@ -14,20 +15,22 @@ namespace Rigger.Configuration
     /// </summary>
     public class DefaultConfigurationService : IConfigurationService
     {
-        private readonly List<IConfigurationSource> _sources = new List<IConfigurationSource>();
+        [Autowire] private IEnumerable<IConfigurationValidator> validators;
+
+        [Autowire] private IEnumerable<IConfigurationSource> sources;
         // immutable / volatile to provide thread safety
         private volatile ImmutableDictionary<string, object> _compiledConfiguration = null;
 
-        /**
-         * Fetch the configuration from all of the sources. This has the side-effect of clearing out
-         * the entire configuration values.
-         */
+        /// <summary>
+        /// Fetch the configuration from all of the sources. This has the side-effect of clearing out
+        /// all of the configuration values.
+        /// </summary>
         public void FetchConfiguration()
         {
             // clear the current configuration
             Dictionary<string, object> compiledConfiguration = new Dictionary<string, object>();
             // load the new configuration.
-            _sources.OrderBy(src => src.Priority)
+            sources.OrderBy(src => src.Priority)
                 .ForEach(s => s.Fetch().ForEach(x =>
                 {
                     compiledConfiguration.Remove(x.Key);
@@ -37,13 +40,13 @@ namespace Rigger.Configuration
             _compiledConfiguration = compiledConfiguration.ToImmutableDictionary();
         }
 
-        /**
-         * Retrieve a value from the configuration and provide the default if it is not found.
-         */
+        /// <summary>
+        /// Validate the configuration using all supplied Configuration Validators.
+        /// </summary>
+        /// <returns></returns>
         public virtual bool ValidateConfiguration()
         {
-            // default no validation.
-            return true;
+            return validators?.All(o => o.IsValid(sources.ToArray())) == true;
         }
 
         public IEnumerable<string> GetKeys()
@@ -63,9 +66,9 @@ namespace Rigger.Configuration
         /// </summary>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="key"></param>
-        /// <param name="_default"></param>
+        /// <param name="default"></param>
         /// <returns></returns>
-        public TValue Get<TValue>(string key, TValue _default)
+        public TValue Get<TValue>(string key, TValue @default)
         {
             if (_compiledConfiguration == null)
             {
@@ -79,7 +82,7 @@ namespace Rigger.Configuration
 
             if (!_compiledConfiguration.ContainsKey(key))
             {
-                return _default;
+                return @default;
             }
 
             return (TValue) _compiledConfiguration[key];
@@ -95,7 +98,7 @@ namespace Rigger.Configuration
                 throw new ArgumentNullException(nameof(source), "Source cannot be null while adding a configuration source.");
             }
 
-            _sources.Add(source);
+            sources = sources.Append(source);
 
             FetchConfiguration();
 

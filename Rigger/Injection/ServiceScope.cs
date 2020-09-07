@@ -8,14 +8,13 @@ namespace Rigger.Injection
         public IServices Services { get; set; }
         public IServiceScope CreateScope()
         {
+            Console.WriteLine("Created scope");
             return new ServiceScope().AddServices(Services);
         }
     }
-    public class ServiceScope : IServiceProvider, IServiceScopeFactory, IServiceScope, IServiceAware
+    public class ServiceScope : IServiceProvider, IServiceScope, IServiceAware
     {
         private IServices services;
-        private IServiceProvider parent;
-
         private string id = Guid.NewGuid().ToString();
 
         internal ServiceScope()
@@ -24,10 +23,9 @@ namespace Rigger.Injection
         }
         protected ServiceScope(ServiceScope parent)
         {
-            this.parent = parent;
         }
 
-        public IServiceProvider ServiceProvider => Services;
+        public IServiceProvider ServiceProvider => this;
 
         public IServices Services
         {
@@ -49,6 +47,8 @@ namespace Rigger.Injection
         {
 
             var service = services.GetService(serviceType);
+
+            Console.WriteLine($"Get scoped service {serviceType} : {service}");
 
             return service;
         }

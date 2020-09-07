@@ -46,7 +46,6 @@ namespace Drone.Bootstrap
                        .AddSource(new AppSettingsConfigurationSource())) // default config
                 .Add<IValueInjector, DefaultValueInjector>()
                 .Add(typeof(ILogger<>), typeof(Logger<>)) // logging
-                .Add<IServiceProvider>(services) // reference to self
                 .Add<IServiceScopeFactory, ServiceScopeFactory>(); // scoped support
 
 

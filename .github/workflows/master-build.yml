@@ -1,6 +1,8 @@
 name: Package Rigger Application
 
 on:
+  push:
+    branches: [ master ]
   pull_request:
     types: [ closed ]
     branches: [ master ]
@@ -30,9 +32,8 @@ jobs:
     - name: Nuget Pack
       run: dotnet pack --configuration Release -p:PackageVersion=${{ steps.gitversion.outputs.SemVer }}
     - name: Nuget Source
-      run: nuget sources add -Name "GPR" -Source "https://nuget.pkg.github.com/cyclopunk/index.json" -UserName "cyclopunk" -Password "${{ secrets.API_KEY  }}"
+      run: nuget sources add -Name "GPR" -Source "https://nuget.pkg.github.com/cyclopunk/index.json" -UserName "cyclopunk" -Password "${{ secrets.GITHUB_TOKEN }}"
     - name: Nuget Publish
-      run: nuget push **\*.nupkg -Source "GPR" -SkipDuplicate 
-      
+      run: nuget push **\*.nupkg -Source "GPR" -SkipDuplicate -ApiKey "${{ secrets.GITHUB_TOKEN }}"      
       
     
