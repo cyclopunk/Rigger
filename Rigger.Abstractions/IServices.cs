@@ -5,6 +5,17 @@ using System.Threading.Tasks;
 
 namespace Rigger.Injection
 {
+    public enum CallSiteType
+    {
+        Enumeration,
+        Constructor,
+        Field,
+        Property,
+        Factory,
+        ServiceProvider,
+        Scope,
+        Method
+    }
     /// <summary>
     /// A lightweight IServiceProvider that will replace the ManagedTypeFactory within Rig
     /// </summary>
@@ -14,8 +25,8 @@ namespace Rigger.Injection
         bool IsManaged(Type type);
         bool IsManaged<T>();
 
-        IServices Replace<T, R>() where R : T;
-        IServices Replace<T,R>(R instance) where R : T;
+        //IServices Replace<T, R>() where R : T;
+        //IServices Replace<T,R>(R instance) where R : T;
         IServices Add(Type lookupType, Type concreteType,
             ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient);
 
@@ -47,6 +58,8 @@ namespace Rigger.Injection
         {
             return (T) GetService(typeof(T));
         }
+
+        object GetService(Type serviceType, CallSiteType callsite = CallSiteType.Method);
 
         public void DisposeScope();
 

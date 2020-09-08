@@ -123,7 +123,7 @@ namespace Rigger.ManagedTypes.Implementations
                         // if it's a value, get it from the configuration service, if it's not, use the container to look it up.
                         if (v != null && Services.IsManaged<IConfigurationService>()) return Services.GetService<IConfigurationService>().Get(v.Key);
 
-                        var lookedUpObject = Services.GetService(m.ParameterType);
+                        var lookedUpObject = Services.GetService(m.ParameterType, CallSiteType.Constructor);
 
                         return lookedUpObject;
 

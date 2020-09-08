@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Rigger.Attributes;
+using Rigger.Extensions;
 using Rigger.ManagedTypes.Resolvers;
 
 namespace Rigger.Injection
@@ -14,14 +16,9 @@ namespace Rigger.Injection
         
         public ServiceLifecycle LifeCycle { get; set; }
 
-        public ExpressionTypeResolver ConditionalTypes { get; set; }
-
-        public List<Type> ExtraTypes = new List<Type>();
-        public List<object> Singletons = new List<object>();
-
-        public IEnumerable<Type> AllTypes()
+        public bool IsConditional()
         {
-            return new List<Type> {ImplementationType}.Concat(ExtraTypes).Where(o => o!= null);
+            return ImplementationType.HasTypeAttribute(typeof(ConditionAttribute));
         }
     }
 }
