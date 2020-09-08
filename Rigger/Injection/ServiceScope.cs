@@ -67,7 +67,7 @@ namespace Rigger.Injection
 
         public IServiceScope CreateScope()
         {
-            return new ServiceScope(this);
+            return new ServiceScope(this).AddServices(Services);
         }
     }
 }
