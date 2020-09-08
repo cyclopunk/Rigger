@@ -1,6 +1,6 @@
 ﻿namespace Rigger.Injection
 {
-    public enum ServiceLifecycle
+    public enum ServiceLifetime
     {
         Singleton,
         Thread,

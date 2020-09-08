@@ -47,7 +47,7 @@ namespace Rigger.Injection
 
         public static bool IsValid(this ServiceDescription description)
         {
-            if (description.ImplementationType == null && description.Singletons.Count > 0)
+            if (description.ImplementationType == null && description.Factory != null)
                 return true;
 
             var interfaces = description.ImplementationType.GetInterfaces();

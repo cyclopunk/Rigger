@@ -42,7 +42,7 @@ namespace Rigger.ManagedTypes
         /// <param name="instance"></param>
         /// <returns></returns>
 
-        IContainer Register(Type lookupType, Func<IServices, object> factory, ServiceLifecycle serviceLifecycle = ServiceLifecycle.Singleton);
+        IContainer Register(Type lookupType, Func<IServices, object> factory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton);
         /// <summary>
         /// Register a singleton with the provided type;
         /// </summary>
@@ -56,7 +56,7 @@ namespace Rigger.ManagedTypes
         /// <typeparam name="TInterface">The interface type of the implementation</typeparam>
         /// <typeparam name="TConcrete">A concrete (non-abstract, non-interface) type that will be used as the implementation</typeparam>
         /// <returns></returns>
-        IContainer Register<TInterface, TConcrete>(ServiceLifecycle type=ServiceLifecycle.Singleton);
+        IContainer Register<TInterface, TConcrete>(ServiceLifetime type=ServiceLifetime.Singleton);
 
         /// <summary>
         /// Register and get a transient managed type.

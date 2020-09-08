@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Rigger.Attributes;
-using Rigger.Extensions;
 using Rigger.ManagedTypes.Resolvers;
 
 namespace Rigger.Injection
@@ -14,11 +14,12 @@ namespace Rigger.Injection
         public Type ImplementationType { get; set; }
         public Func<IServices, object> Factory { get; set; }
         
-        public ServiceLifecycle LifeCycle { get; set; }
+        public ServiceLifetime Lifetime { get; set; }
 
         public bool IsConditional()
         {
-            return ImplementationType.HasTypeAttribute(typeof(ConditionAttribute));
+            return ImplementationType.GetCustomAttribute(typeof(ConditionAttribute)) != null;
+            
         }
     }
 }

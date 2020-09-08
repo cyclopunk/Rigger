@@ -70,7 +70,7 @@ namespace Drone.Tests
        public TestModule(IServices services)
        {
 
-           services.Replace<ILoggerFactory, ILoggerFactory>(new TestLogger(TestLog.output).LoggerFactory);
+           //services.Replace<ILoggerFactory, ILoggerFactory>(new TestLogger(TestLog.output).LoggerFactory);
        }
    }
 }

@@ -28,14 +28,14 @@ namespace Rigger.Injection
         //IServices Replace<T, R>() where R : T;
         //IServices Replace<T,R>(R instance) where R : T;
         IServices Add(Type lookupType, Type concreteType,
-            ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient);
+            ServiceLifetime serviceLifetime = ServiceLifetime.Transient);
 
-        IServices Add<TLookupType>(Type concreteType, ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient);
+        IServices Add<TLookupType>(Type concreteType, ServiceLifetime serviceLifetime = ServiceLifetime.Transient);
 
-        IServices Add<TLookupType, TConcreteType>(ServiceLifecycle serviceLifecycle = ServiceLifecycle.Transient);
+        IServices Add<TLookupType, TConcreteType>(ServiceLifetime serviceLifetime = ServiceLifetime.Transient);
 
         IServices Add(Type type, object instance);
-        public IServices Add(Type lookupType, Func<IServices, object> factory, ServiceLifecycle serviceLifecycle = ServiceLifecycle.Singleton);
+        public IServices Add(Type lookupType, Func<IServices, object> factory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton);
 
         /// <summary>
         /// Add a singleton instance.
@@ -45,8 +45,8 @@ namespace Rigger.Injection
         /// <returns></returns>
         public IServices Add<TLookupType>(object instance);
 
-
-        public IServices OfLifecycle(params ServiceLifecycle[] serviceLifecycle);
+        
+        public IEnumerable<ServiceDescription> List(Type type=null);
 
         /// <summary>
         /// Get a service that is registered as the type provided
@@ -57,6 +57,11 @@ namespace Rigger.Injection
             where T : class
         {
             return (T) GetService(typeof(T));
+        }
+        public T GetService<T>(CallSiteType type)
+            where T : class
+        {
+            return (T) GetService(typeof(T), type);
         }
 
         object GetService(Type serviceType, CallSiteType callsite = CallSiteType.Method);

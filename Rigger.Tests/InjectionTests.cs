@@ -145,7 +145,7 @@ namespace Rigger.Tests {
                 .Add<IInstanceFactory>(new AutowireInstanceFactory())
                 .Add<IOption<SomeOption>, OptionOne>()
                 .Add<IOption<AnotherOption>, OptionTwo>()
-                .Add<ISingletonService, SingletonService>(ServiceLifecycle.Singleton)
+                .Add<ISingletonService, SingletonService>(ServiceLifetime.Singleton)
                 .Add<TransientService, TransientService>();
         }
         public class OptionThree : IOption<SomeOption>

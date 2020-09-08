@@ -45,10 +45,10 @@ namespace Rigger.Injection
         {
             get
             {
-                return description.LifeCycle switch
+                return description.Lifetime switch
                 {
-                    ServiceLifecycle.Thread => MakeThreadInstance(),
-                    ServiceLifecycle.Singleton => MakeSingletonInstance(),
+                    ServiceLifetime.Thread => MakeThreadInstance(),
+                    ServiceLifetime.Singleton => MakeSingletonInstance(),
                     _ => description.Factory(Services)
                 };
             }

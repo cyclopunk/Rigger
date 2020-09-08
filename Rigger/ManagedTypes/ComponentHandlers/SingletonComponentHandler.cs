@@ -20,7 +20,7 @@ namespace Rigger.ManagedTypes.ComponentHandlers
             
             var lookupType = attribute.LookupType ?? type.GetInterfaces().FirstOr(type);
 
-            Services.Add(lookupType, type, ServiceLifecycle.Singleton);
+            Services.Add(lookupType, type, ServiceLifetime.Singleton);
 
             _logger?.LogDebug($"Created [Singleton] registration for {type} using Lookup Type {lookupType}");
         }

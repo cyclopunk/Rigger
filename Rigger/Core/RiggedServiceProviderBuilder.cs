@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using ServiceLifetime = Rigger.Injection.ServiceLifetime;
 
 namespace Rigger.Core
 {
@@ -26,10 +27,10 @@ namespace Rigger.Core
             {
                 var lifetime = o.Lifetime switch
                 {
-                    ServiceLifetime.Singleton => ServiceLifecycle.Singleton,
-                    ServiceLifetime.Scoped => ServiceLifecycle.Scoped,
-                    ServiceLifetime.Transient => ServiceLifecycle.Transient,
-                    _ => ServiceLifecycle.Transient,
+                    Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton => ServiceLifetime.Singleton,
+                    Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped => ServiceLifetime.Scoped,
+                    Microsoft.Extensions.DependencyInjection.ServiceLifetime.Transient => ServiceLifetime.Transient,
+                    _ => ServiceLifetime.Transient,
                 };
 
                 if (o.ImplementationInstance != null)

@@ -19,33 +19,12 @@ namespace Rigger.Injection
         {
             object instance = null;
 
-            if (typeof(IConstructorActivator).IsAssignableFrom (type))
-            {
-                instance = Activator.CreateInstance(type, new object[] { });
-                if (instance is IServiceAware i) i.AddServices(Services);
-                return instance;
-            }
+            invoker ??= Services.GetService<IConstructorActivator>(CallSiteType.ServiceProvider);
 
-            invoker ??= Services.GetService<IConstructorActivator>();
-
-            // loop protection
-            if (typeof(IAutowirer).IsAssignableFrom (type))
-            {
-                instance = invoker?.Construct(type, new object[] { });
-                if (instance is IServiceAware i) i.AddServices(Services);
-                return instance;
-            }
-            
             // if we've created an instance above, return it and add the services if it is service aware.
-            autowirer ??= Services.GetService<IAutowirer>();
+            autowirer ??= Services.GetService<IAutowirer>(CallSiteType.ServiceProvider);
 
-            if (typeof(IValueInjector).IsAssignableFrom(type))
-            {
-                instance = invoker?.Construct(type, new object[] { });
-                if (instance is IServiceAware i) i.AddServices(Services);
-                return instance;
-            }
-            injector ??= Services.GetService<IValueInjector>();
+            injector ??= Services.GetService<IValueInjector>(CallSiteType.ServiceProvider);
 
             instance = invoker?.Construct(type, new object[] {});
 

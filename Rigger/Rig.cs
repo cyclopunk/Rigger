@@ -17,7 +17,7 @@ using Rigger.Reflection;
 namespace Rigger {
     /// <summary>
    /// Top level class for an application container. The container will hold all of the
-   /// managed types and manage their lifecycle as well as provide a component scanning
+   /// managed types and manage their lifetime as well as provide a component scanning
    /// functionality that will allow attributes to be used to manage objects.
    ///
    /// Application containers should be implemented for whatever DI framework is being used for
@@ -64,16 +64,16 @@ namespace Rigger {
            return this;
        }
 
-       public IContainer Register<TInterface, TConcrete>(ServiceLifecycle type = ServiceLifecycle.Singleton)
+       public IContainer Register<TInterface, TConcrete>(ServiceLifetime type = ServiceLifetime.Singleton)
        {
            Services.Add<TInterface,TConcrete>(type);
 
            return this;
        }
 
-       public IContainer Register(Type lookupType, Type implType, ServiceLifecycle lifecycle = ServiceLifecycle.Singleton)
+       public IContainer Register(Type lookupType, Type implType, ServiceLifetime lifetime = ServiceLifetime.Singleton)
         {
-            Services.Add(lookupType, implType, lifecycle);
+            Services.Add(lookupType, implType, lifetime);
 
             return this;
         }
@@ -105,7 +105,7 @@ namespace Rigger {
                .FindAll(o => o.FullName.Contains(PLUGIN_NAMESPACE)));
 
            autoScannedAssemblies.Add(GetType().Assembly);
-           // ServiceLifecycle attributes from Traits
+           // ServiceLifetime attributes from Traits
            autoScannedAssemblies.Add(typeof(ILifecycle).Assembly);
 
            //logger.LogInformation($"Default assemblies: {string.Join(",",autoScannedAssemblies.Select(o=>o.FullName))}");
@@ -184,7 +184,7 @@ namespace Rigger {
             // bootstrap by adding the module
 
             Services
-                .Add<ModuleComponentScanner, ModuleComponentScanner>(ServiceLifecycle.Singleton)
+                .Add<ModuleComponentScanner, ModuleComponentScanner>(ServiceLifetime.Singleton)
                 .GetService<ModuleComponentScanner>()
                 .ComponentScan(assemblies);
 
@@ -276,9 +276,9 @@ namespace Rigger {
             return instance;
         }
 
-        public IContainer Register(Type lookupType, Func<IServices, object> factory, ServiceLifecycle serviceLifecycle = ServiceLifecycle.Singleton)
+        public IContainer Register(Type lookupType, Func<IServices, object> factory, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         {
-            Services.Add(lookupType, factory, serviceLifecycle);
+            Services.Add(lookupType, factory, serviceLifetime);
 
             return this;
         }

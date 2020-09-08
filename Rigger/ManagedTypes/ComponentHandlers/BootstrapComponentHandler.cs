@@ -11,7 +11,7 @@ namespace Rigger.ManagedTypes.ComponentHandlers
 
         public void HandleComponent(Type type)
         {
-            Services.Add(type, type, ServiceLifecycle.Singleton);
+            Services.Add(type, type, ServiceLifetime.Singleton);
 
             Services.GetService(type); // make an instance
 

@@ -8,6 +8,7 @@ using Rigger.ManagedTypes.Implementations;
 using Rigger.Reflection;
 using Xunit;
 using Xunit.Abstractions;
+using ServiceLifetime = Rigger.Injection.ServiceLifetime;
 
 namespace Rigger.Tests
 {
@@ -46,9 +47,9 @@ namespace Rigger.Tests
                 .Add(typeof(ILogger<>), typeof(Logger<>))
                 .Add<IConstructorActivator>(new ManagedConstructorInvoker())
                 .Add<IInstanceFactory,AutowireInstanceFactory>()
-                .Add<IScopedService, ScopedService>(ServiceLifecycle.Scoped)
-                .Add<IScopedService2, ScopedService>(ServiceLifecycle.Scoped)
-                .Add<IServiceScopeFactory, ServiceScopeFactory>();
+                .Add<IScopedService, ScopedService>(ServiceLifetime.Scoped)
+                .Add<IScopedService2, ScopedService>(ServiceLifetime.Scoped)
+                .Add<IServiceScopeFactory, ServiceScopeFactory>(ServiceLifetime.Singleton);
 
                 return services;
         }

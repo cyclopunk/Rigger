@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using FastDeepCloner;
 using Microsoft.Extensions.DependencyInjection;
+using Rigger.Extensions;
 
 namespace Rigger.Injection
 {
@@ -12,26 +17,29 @@ namespace Rigger.Injection
             return new ServiceScope().AddServices(Services);
         }
     }
-    public class ServiceScope : IServiceProvider, IServiceScope, IServiceAware
+    public class ServiceScope : IServiceProvider, IServiceScope, IServiceAware,IServiceScopeFactory
     {
-        private IServices services;
+        internal ConcurrentDictionary<Type, object> ScopedServices = new ConcurrentDictionary<Type, object>();
+        internal ServiceScope Parent;
         private string id = Guid.NewGuid().ToString();
 
         internal ServiceScope()
         {
 
         }
+
+        public ServiceScope(ServiceScope parent)
+        {
+            this.Parent = parent;
+        }
         public IServiceProvider ServiceProvider => this;
 
-        public IServices Services
-        {
-            get => services; 
-            set => services = value.OfLifecycle(ServiceLifecycle.Singleton, ServiceLifecycle.Scoped);
-        }
+        public IServices Services { get; set; }
 
         public void Dispose()
         {
-            services.DisposeScope();
+            ScopedServices.Values.OfType<IDisposable>().ForEach(o => o.Dispose());
+            ScopedServices.Clear();
         }
 
         public object GetService(Type serviceType)
@@ -40,12 +48,26 @@ namespace Rigger.Injection
             {
                 return this;
             }
+            if (typeof(IServiceScopeFactory).IsAssignableFrom(serviceType))
+            {
+                return this;
+            }
 
-            var service = services.GetService(serviceType);
+            if (Parent != null && Parent.ScopedServices.ContainsKey(serviceType))
+            {
+                return Parent.ScopedServices[serviceType];
+            }
+
+            var service = ScopedServices.GetOrAdd(serviceType, (k) => Services.GetService(k, CallSiteType.Scope));
 
             Console.WriteLine($"Get scoped service {serviceType} : {service}");
 
             return service;
+        }
+
+        public IServiceScope CreateScope()
+        {
+            return new ServiceScope(this);
         }
     }
 }
