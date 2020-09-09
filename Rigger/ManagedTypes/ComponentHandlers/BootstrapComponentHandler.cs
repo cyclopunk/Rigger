@@ -13,7 +13,7 @@ namespace Rigger.ManagedTypes.ComponentHandlers
         {
             Services.Add(type, type, ServiceLifetime.Singleton);
 
-            Services.GetService(type); // make an instance
+            Services.GetService(type, CallSiteType.Method); // make an instance
 
             //typeRegistration.ImplementationType.Manager.InvokeAttributeMethods<OnCreateAttribute>(instance);
             //typeRegistration.ImplementationType.Manager.InvokeAttributeMethods<OnStartupAttribute>(instance);

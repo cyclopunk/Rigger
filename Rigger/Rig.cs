@@ -195,7 +195,7 @@ namespace Rigger {
                 throw new Exception("No ILogger<> registered, please register an ILogger with the container as it is a guaranteed service.");
             }
             
-            var scanners = Services.GetService<IEnumerable<IComponentScanner>>().ToList();
+            var scanners = Services.GetService<IEnumerable<IComponentScanner>>(CallSiteType.Method).ToList();
 
             if (!scanners.Any())
             {

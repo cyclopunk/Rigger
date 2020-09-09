@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Rigger.ManagedTypes.ComponentScanners;
 using Rigger.Reflection;
 
 namespace Rigger.Injection
@@ -25,11 +26,14 @@ namespace Rigger.Injection
                 typeof(IAutowirer),
                 typeof(IConstructorActivator),
                 typeof(IValueInjector),
+                typeof(IComponentScanner)
             };
 
-            if (serviceTypes.Contains(ServiceType))
+            if (serviceTypes.Contains(ServiceType) || typeof(IComponentScanner).IsAssignableFrom(ServiceType))
             {
-                var instance = Activator.CreateInstance(Description.ImplementationType);
+                var instance = ServiceType.HasServiceConstructor() 
+                    ? Activator.CreateInstance(Description.ImplementationType, Services) 
+                    : Activator.CreateInstance(Description.ImplementationType);
 
                 if (instance is IServiceAware factory)
                 {

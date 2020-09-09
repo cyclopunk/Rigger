@@ -19,7 +19,7 @@ namespace Rigger.Injection
     {
 
         private readonly IDictionary<CallSite, IServiceResolver> _resolutions = new Dictionary<CallSite, IServiceResolver>();
-        private readonly ConcurrentBag<ServiceDescription> services = new ConcurrentBag<ServiceDescription>();
+        private readonly ConcurrentQueue<ServiceDescription> services = new ConcurrentQueue<ServiceDescription>();
         private readonly ConcurrentDictionary<Type, object> singletons = new ConcurrentDictionary<Type, object>();
 
         private bool _disposedValue;
@@ -39,7 +39,7 @@ namespace Rigger.Injection
         /// <returns></returns>
         public IServices Add(Type serviceType, Type concreteType, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
         {
-            services.Add(new ServiceDescription
+            services.Enqueue(new ServiceDescription
             {
                 ServiceType = serviceType,
                 ImplementationType = concreteType,
@@ -78,7 +78,7 @@ namespace Rigger.Injection
                 Lifetime = ServiceLifetime.Singleton
             };
 
-            services.Add(description);
+            services.Enqueue(description);
 
             if (instance is IServiceAware sa)
             {
@@ -112,7 +112,7 @@ namespace Rigger.Injection
         /// <returns></returns>
         public IServices Add(Type lookupType, Func<IServices, object> factory, ServiceLifetime lifetime = ServiceLifetime.Singleton)
         {
-            services.Add(new ServiceDescription
+            services.Enqueue(new ServiceDescription
             {
                 ServiceType = lookupType,
                 ImplementationType = null,
@@ -234,6 +234,11 @@ namespace Rigger.Injection
             if (isSingleton)
             {
                 singletons.TryUpdate(serviceType, instance, null);
+            }
+
+            if (instance == null)
+            {
+
             }
 
             return instance;

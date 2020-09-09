@@ -109,6 +109,18 @@ namespace Rigger.Tests
             var conditionalService = rig.Get<IConditionalService>();
 
             conditionalService.GetColor().Should().Be("Green");
+            Environment.SetEnvironmentVariable("ServiceColor", "Blue");
+
+            rig = new RiggedApp();
+
+            rig.Get<IConfigurationService>().Get("ServiceColor").Should().Be("Blue");
+
+            //rig.Register<IConditionalService, BlueService>();
+            //rig.Register<IConditionalService, GreenService>();
+
+            conditionalService = rig.Get<IConditionalService>();
+
+            conditionalService.GetColor().Should().Be("Blue");
         }
         [Fact]
         public void TestValueInjection()

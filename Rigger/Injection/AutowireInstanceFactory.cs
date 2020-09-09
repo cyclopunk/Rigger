@@ -36,6 +36,8 @@ namespace Rigger.Injection
             autowirer?.Inject(instance);
             injector?.Inject(instance);
 
+            if (instance is IServiceAware sa) sa.AddServices(Services);
+
             return instance;
         }
     }
