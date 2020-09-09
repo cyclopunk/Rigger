@@ -20,16 +20,18 @@ namespace Rigger.ManagedTypes.ComponentHandlers
         public void HandleComponent(Type type)
         {
             ManagedAttribute attribute = type.GetCustomAttribute<ManagedAttribute>();
-            if (attribute != null)
+            if (attribute == null) return;
+            // the provided ServiceType on the attribute, the first interface or the concrete type is used (in that priority) as 
+            // the lookup type.
+            var lookupType = attribute.LookupType ?? type.GetInterfaces().FirstOr(type);
+
+            if (type.HasTypeAttribute(typeof(ConditionAttribute)))
             {
-
-                // the provided ServiceType on the attribute, the first interface or the concrete type is used (in that priority) as 
-                // the lookup type.
-                var lookupType = attribute.LookupType ?? type.GetInterfaces().FirstOr(type);
-
-                var typeRegistration = Services.Add(lookupType, type);
-
-                _logger.LogInformation($"FORGE: Registered {typeRegistration} managed type {type} as {lookupType}");
+                Services.AddConditionalService(lookupType, type,ServiceLifetime.Transient);
+            }
+            else
+            {
+                Services.Add(lookupType, type);
             }
         }
     }

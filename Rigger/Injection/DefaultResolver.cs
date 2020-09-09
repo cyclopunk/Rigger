@@ -40,6 +40,13 @@ namespace Rigger.Injection
             // default is transient
             var instance = InstanceFactory?.Make(Description.ImplementationType);
 
+            FireLifecycleMethods(instance);
+
+            return instance;
+        }
+
+        protected void FireLifecycleMethods(object instance)
+        {
             if (Cache == null)
             {
                 Cache = new List<ZeroParameterMethodAccessor>();
@@ -58,8 +65,6 @@ namespace Rigger.Injection
             {
                 Cache.ForEach(o => o.Invoke(instance));
             }
-
-            return instance;
         }
     }
 }

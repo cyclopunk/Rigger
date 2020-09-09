@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Rigger.Configuration;
 using Rigger.ManagedTypes.ComponentScanners;
 using Rigger.Reflection;
 
@@ -19,6 +20,7 @@ namespace Rigger.Injection
             }
 
             // these service types can be self-referencing, so we'll handle them with an Activator.
+            // we can probably just change this to IServiceAware
             IEnumerable<Type> serviceTypes = new List<Type>
             {
                 typeof(IInstanceFactory),
@@ -26,7 +28,8 @@ namespace Rigger.Injection
                 typeof(IAutowirer),
                 typeof(IConstructorActivator),
                 typeof(IValueInjector),
-                typeof(IComponentScanner)
+                typeof(IComponentScanner),
+                typeof(IConfigurationService)
             };
 
             if (serviceTypes.Contains(ServiceType) || typeof(IComponentScanner).IsAssignableFrom(ServiceType))
@@ -39,6 +42,8 @@ namespace Rigger.Injection
                 {
                     factory.Services = Services;
                 }
+
+                FireLifecycleMethods(instance);
 
                 return instance;
             }

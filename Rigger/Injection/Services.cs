@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Rigger.Attributes;
 using Rigger.Exceptions;
 using Rigger.Extensions;
 using Rigger.Injection.Defaults;
@@ -21,6 +22,7 @@ namespace Rigger.Injection
         private readonly IDictionary<CallSite, IServiceResolver> _resolutions = new Dictionary<CallSite, IServiceResolver>();
         private readonly ConcurrentQueue<ServiceDescription> services = new ConcurrentQueue<ServiceDescription>();
         private readonly ConcurrentDictionary<Type, object> singletons = new ConcurrentDictionary<Type, object>();
+        private readonly ConcurrentDictionary<Type, ExpressionTypeResolver> conditionalServices = new ConcurrentDictionary<Type, ExpressionTypeResolver>();
 
         private bool _disposedValue;
 
@@ -135,6 +137,17 @@ namespace Rigger.Injection
             return this;
         }
 
+        public IServices AddConditionalService(Type serviceType, Type instanceType,
+            ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+        {
+            ExpressionTypeResolver resolver = conditionalServices.GetOrAdd(serviceType, (k) => new ExpressionTypeResolver().AddServices(this));
+            var expression = instanceType.GetCustomAttribute<ConditionAttribute>().Expression;
+
+            resolver.AddType(expression, instanceType);
+
+            return this;
+        }
+
         public IEnumerable<ServiceDescription> List(Type type=null)
         {
             return services.Where(i => type == null || i.ServiceType.IsAssignableFrom(type));
@@ -206,6 +219,15 @@ namespace Rigger.Injection
                         () => new OpenGenericResolver(this, serviceType)).Resolve();
                 }
             }
+
+            // conditionals
+
+            if (conditionalServices.ContainsKey(serviceType))
+            {
+                return _resolutions.GetOrPut(new CallSite(serviceType, callsite), () => new ConditionalResolver(this, serviceType, conditionalServices[serviceType])).Resolve();
+            }
+
+            // singletons
 
             var isSingleton = singletons.ContainsKey(serviceType);
 

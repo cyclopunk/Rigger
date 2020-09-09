@@ -44,6 +44,7 @@ namespace Rigger.Injection
         /// <param name="instance"></param>
         /// <returns></returns>
         public IServices Add<TLookupType>(object instance);
+        public IServices AddConditionalService(Type serviceType, Type instanceType, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton);
 
         
         public IEnumerable<ServiceDescription> List(Type type=null);
@@ -65,6 +66,8 @@ namespace Rigger.Injection
         }
 
         object GetService(Type serviceType, CallSiteType callsite = CallSiteType.Method);
+
+        
 
         public void DisposeScope();
 

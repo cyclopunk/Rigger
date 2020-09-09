@@ -19,7 +19,7 @@ namespace Rigger.Injection
     /// </summary>
     public class ExpressionTypeResolver : ITypeResolver
     {
-        [Autowire] private IConfigurationService configurationService;
+        private IConfigurationService configurationService;
         
         private Dictionary<Func<bool>, Type> expressionDictionary =
             new Dictionary<Func<bool>, Type>();
@@ -31,7 +31,8 @@ namespace Rigger.Injection
         /// <returns></returns>
         public Type ResolveType()
         {
-      
+            configurationService ??= Services.GetService<IConfigurationService>(CallSiteType.Method);
+
             var matches = expressionDictionary
                 .Where(keyPair => keyPair.Key.Invoke())
                 .Select(kvp => kvp.Value)
@@ -64,6 +65,13 @@ namespace Rigger.Injection
         /// <returns></returns>
         public ExpressionTypeResolver AddType(string expressionString, Type type)
         {
+            
+            configurationService ??= Services.GetService<IConfigurationService>(CallSiteType.Method);
+            if (configurationService == null)
+            {
+                throw new ContainerException(
+                    "Cannot use conditional services without registering an IConfigurationService");
+            }
             // only allow variable names that
             // are valid as configuration variables could be in the form of Category:Key:Something
 
@@ -103,5 +111,7 @@ namespace Rigger.Injection
 
             return this;
         }
+
+        public IServices Services { get; set; }
     }
 }

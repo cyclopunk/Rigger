@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Rigger.Attributes;
+using Rigger.Configuration;
 using Rigger.Extensions;
 using Rigger.Implementations;
 using Rigger.Injection;
@@ -42,6 +43,7 @@ namespace Rigger.Tests
 
             return new Services()
                 .Add<IAutowirer>(new ContainerAutowirer())
+                .Add<IConfigurationService, DefaultConfigurationService>()
                 .Add<IComponentHandler<SingletonAttribute>, SingletonComponentHandler>()
                 .Add<IComponentHandler<ManagedAttribute>, ManagedComponentHandler>()
                 .Add<IComponentScanner, SingletonComponentScanner>()

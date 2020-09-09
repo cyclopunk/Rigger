@@ -2,13 +2,23 @@
 
 namespace Rigger.Injection
 {
-    public class ConditionalResolver : IServiceResolver
+    public class ConditionalResolver : ImplementationTypeResolver
     {
-        public IServices Services { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        private Type serviceType;
+        private ExpressionTypeResolver resolver;
 
-        public object Resolve()
+        public ConditionalResolver(IServices services, Type serviceType, ExpressionTypeResolver resolver) : base (services, resolver.ResolveType())
         {
-            return null;
+
+            this.resolver = resolver;
+            this.serviceType = serviceType;
+        }
+
+        public override object Resolve()
+        {
+            ImplementationType = resolver.ResolveType();
+            
+            return base.Resolve();
         }
     }
 }

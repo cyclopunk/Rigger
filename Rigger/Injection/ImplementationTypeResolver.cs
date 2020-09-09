@@ -14,28 +14,19 @@ namespace Rigger.Injection
 
         internal Type ImplementationType;
 
-        internal object ResolvedService;
-
         public ImplementationTypeResolver(IServices services, Type implementationType)
         {
-            this.ImplementationType = implementationType;
-            this.Services = services;
-            this.Description = Services.List().First(o => o.ImplementationType == this.ImplementationType);
+            ImplementationType = implementationType;
+            Services = services;
         }
 
-        public object Resolve()
+        public virtual object Resolve()
         {
-            if (ResolvedService != null && Description.Lifetime == ServiceLifetime.Singleton)
-            {
-                return ResolvedService;
-            }
-
+          
             var instanceFactory = Services.GetService<IInstanceFactory>();
             // default is transient
-            ResolvedService = instanceFactory?.Make(Description.ImplementationType) 
-                              ?? Activator.CreateInstance(Description.ImplementationType);
-
-            return ResolvedService;
+            return instanceFactory?.Make(ImplementationType) 
+                              ?? Activator.CreateInstance(ImplementationType);
         }
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System;
+using Rigger.Injection;
 
 namespace Rigger.ManagedTypes.Resolvers
 {
-    public interface ITypeResolver
+    public interface ITypeResolver : IServiceAware
     {
         Type ResolveType();
     }
