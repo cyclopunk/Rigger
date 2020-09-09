@@ -31,6 +31,11 @@ namespace Rigger.Injection
 
         }
 
+        internal class SingletonContainer : List<object>
+        {
+
+        }
+
         /// <summary>
         /// Main Method for registering a new service.
         ///  
@@ -91,13 +96,13 @@ namespace Rigger.Injection
             {
                 object o = v;
 
-                if (o is IList<object> i)
+                if (o is SingletonContainer i)
                 {
                     i.Add(instance);
                 }
                 else
                 {
-                    o = new List<object> {instance, v};
+                    o = new SingletonContainer {instance, v};
                 }
 
                 return o;
@@ -150,7 +155,7 @@ namespace Rigger.Injection
 
         public IEnumerable<ServiceDescription> List(Type type=null)
         {
-            return services.Where(i => type == null || i.ServiceType.IsAssignableFrom(type));
+            return services.Where(i => type == null || i.ServiceType == type);
         }
 
         public IEnumerable<ServiceDescription> GetDescription(Type type)
@@ -209,8 +214,12 @@ namespace Rigger.Injection
 
                 if (typeof(IEnumerable<>).IsAssignableFrom(genericType))
                 {
+                    var typeParam = serviceType.GetGenericArguments().First();
+
+                    singletons.TryGetValue(typeParam, out var sing);
+
                     return _resolutions.GetOrPut(new CallSite(serviceType, callsite),
-                        () => new EnumerableServiceResolver(this, serviceType)).Resolve();
+                        () => new EnumerableServiceResolver(this, serviceType, sing, this.services.Where(o => o.ServiceType == typeParam))).Resolve();
                 }
 
                 if (GetDescription(genericType).FirstOrDefault() != null)
@@ -233,7 +242,11 @@ namespace Rigger.Injection
 
             if (isSingleton)
             {
-                var sinstance = singletons[serviceType];
+                //var sinstance = singletons[serviceType];
+                singletons.TryGetValue(serviceType, out var sinstance);
+
+                var sinstances = singletons.Where(o => o.Key == serviceType);
+
                 if (sinstance != null)
                 {
                     return sinstance;

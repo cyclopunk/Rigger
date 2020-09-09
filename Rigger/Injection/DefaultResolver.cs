@@ -35,6 +35,10 @@ namespace Rigger.Injection
                 return null;
             }
 
+            if (Description.Factory != null)
+            {
+                return Description.Factory(Services);
+            }
             // we should have an instance factory by now.
             InstanceFactory ??= Services.GetService<IInstanceFactory>();
             // default is transient
