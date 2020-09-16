@@ -29,7 +29,7 @@ namespace aspnetcoreapp
                 {
                     
                     webBuilder
-                        .UseIISIntegration() 
+                        //.UseIISIntegration() 
                         .UseSetting("detailedErrors", "true")
                         .UseStartup<Startup>();
                 });

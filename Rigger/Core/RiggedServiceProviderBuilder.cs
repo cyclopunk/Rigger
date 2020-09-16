@@ -25,6 +25,8 @@ namespace Rigger.Core
             
             services.ForEach(o =>
             {
+                string typeName = o.ServiceType.ToString();
+
                 var lifetime = o.Lifetime switch
                 {
                     Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton => ServiceLifetime.Singleton,

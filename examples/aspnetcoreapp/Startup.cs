@@ -54,6 +54,7 @@ namespace aspnetcoreapp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
         }
     }

@@ -9,4 +9,8 @@
     <ProjectReference Include="..\..\Rigger\Rigger.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
 </Project>
