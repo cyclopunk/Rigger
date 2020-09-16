@@ -19,7 +19,7 @@ namespace Rigger.Core
             this.services = services;
         }
 
-        public IServiceProvider NewRig(string droneNamespace = "Drone.")
+        public IServiceProvider NewRig(string[] droneNamespace)
         {
             var rig = new Rig(droneNamespace);
             

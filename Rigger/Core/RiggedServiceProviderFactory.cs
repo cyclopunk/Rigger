@@ -7,9 +7,9 @@ namespace Rigger.Core
 {
     public class RiggedServiceProviderFactory : IServiceProviderFactory<RiggedServiceProviderBuilder>
     {
-        public string DroneNamespace { get; set; }
+        public string[] DroneNamespace { get; set; }
 
-        public RiggedServiceProviderFactory(string droneNamespace = "Drone.")
+        public RiggedServiceProviderFactory(params string[] droneNamespace)
         {
             DroneNamespace = droneNamespace;
         }
