@@ -28,8 +28,7 @@ namespace Rigger.Injection
                 typeof(IAutowirer),
                 typeof(IConstructorActivator),
                 typeof(IValueInjector),
-                typeof(IComponentScanner),
-                typeof(IConfigurationService)
+                typeof(IComponentScanner)
             };
 
             if (serviceTypes.Contains(ServiceType) || typeof(IComponentScanner).IsAssignableFrom(ServiceType))

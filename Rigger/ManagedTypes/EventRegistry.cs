@@ -38,7 +38,7 @@ namespace Rigger.ManagedTypes
 
             var methods = instance.GetType().MethodsWithAttribute<OnEventAttribute>();
 
-            var registrations = methods.Map(o =>
+            var registrations = methods.Select(o =>
             {
                 _eventRegistry.GetOrPut(instance, () => new List<IEventReceiver>());
 
@@ -73,7 +73,7 @@ namespace Rigger.ManagedTypes
                 return;
             }
 
-            _typeCache[eventToFire.GetType()].ToList().FindAll(f =>
+            _typeCache[eventToFire.GetType()].ToList().Where(f =>
             {
                 var etype = f.EventType;
                 var ftype = eventToFire.GetType();
@@ -86,8 +86,8 @@ namespace Rigger.ManagedTypes
         }
         public async Task FireAsync(object eventToFire)
         {
-            var tasks = _typeCache[eventToFire.GetType()].ToList().FindAll(f => f.EventType == eventToFire.GetType())
-                .Map(o => (Task) o?.Invoker?.Invoke(o.Receiver, eventToFire));
+            var tasks = _typeCache[eventToFire.GetType()].ToList().Where(f => f.EventType == eventToFire.GetType())
+                .Select(o => (Task) o?.Invoker?.Invoke(o.Receiver, eventToFire));
 
             await Task.WhenAll(tasks);
         }

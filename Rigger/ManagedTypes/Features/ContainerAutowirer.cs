@@ -22,7 +22,7 @@ namespace Rigger.ManagedTypes.Features
 
         public void CacheType(Type type)
         {
-            type.PropertyWithAttribute<AutowireAttribute>().ForEach(property =>
+            type.PropertiesWithAttribute<AutowireAttribute>().ForEach(property =>
             {
                 var accessor = new ExpressionPropertyAccessor(property);
                 _cache.AddOrUpdate(type, new ConcurrentBag<ExpressionPropertyAccessor> {accessor}, (key, value) =>

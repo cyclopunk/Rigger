@@ -30,7 +30,7 @@ namespace Rigger.ManagedTypes
         /// <param name="context">The application context to load.</param>
         public void LoadModules(Services services)
         {
-            _type.GetNestedTypes().FindAll(t => t.GetCustomAttribute<ModuleAttribute>() != null)
+            _type.GetNestedTypes().Where(t => t.GetCustomAttribute<ModuleAttribute>() != null)
                 .OrderBy(t => t.GetCustomAttribute<ModuleAttribute>().Priority)
                 .ForEach(nt =>
             {

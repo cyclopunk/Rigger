@@ -17,16 +17,13 @@ namespace Rigger.Injection
 
         public object Make(Type type)
         {
-            object instance = null;
-
             invoker ??= Services.GetService<IConstructorActivator>(CallSiteType.ServiceProvider);
 
-            // if we've created an instance above, return it and add the services if it is service aware.
             autowirer ??= Services.GetService<IAutowirer>(CallSiteType.ServiceProvider);
 
             injector ??= Services.GetService<IValueInjector>(CallSiteType.ServiceProvider);
 
-            instance = invoker?.Construct(type, new object[] {});
+            var instance = invoker?.Construct(type, new object[] {});
 
             if (instance == null)
             {

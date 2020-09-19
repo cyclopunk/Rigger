@@ -25,7 +25,7 @@ namespace Rigger.ManagedTypes.ComponentScanners
         {
             var handler = Services.GetService<IComponentHandler<TAttribute>>();
 
-            var foundAttributeTypes = assemblies.Map(assembly => assembly.TypesWithAttribute<TAttribute>())
+            var foundAttributeTypes = assemblies.Select(assembly => assembly.TypesWithAttribute<TAttribute>())
                 .Combine().ToList();
 
             foundAttributeTypes.ForEach(handler.HandleComponent);

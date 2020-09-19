@@ -20,7 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "aspnetcoreapp", "examples\aspnetcoreapp\aspnetcoreapp.csproj", "{5DDA7658-C140-4812-A3B5-E86C99286189}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rigger.Examples.Core", "examples\aspnetcoreapp\Rigger.Examples.Core.csproj", "{5DDA7658-C140-4812-A3B5-E86C99286189}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

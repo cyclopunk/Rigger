@@ -102,7 +102,7 @@ namespace Rigger {
            List<Assembly> autoScannedAssemblies = new List<Assembly>();
            
            autoScannedAssemblies.AddRange(AppDomain.CurrentDomain.GetAssemblies()
-               .FindAll(o => o.FullName.Contains(PLUGIN_NAMESPACE)));
+               .Where(o => o.FullName.Contains(PLUGIN_NAMESPACE)));
 
            autoScannedAssemblies.Add(GetType().Assembly);
            // ServiceLifetime attributes from Traits
@@ -113,12 +113,12 @@ namespace Rigger {
            return autoScannedAssemblies.Distinct().ToArray();
        }
 
-       private Assembly[] SearchAppDomain(string searchString)
+       private IEnumerable<Assembly> SearchAppDomain(string searchString)
        {
            AddDynamicAssemblies(searchString);
 
            return AppDomain.CurrentDomain.GetAssemblies()
-               .FindAll(o => o.FullName.Contains(searchString));
+               .Where(o => o.FullName.Contains(searchString));
        }
 
        /// <summary>
@@ -185,6 +185,7 @@ namespace Rigger {
 
             Services
                 .Add<ModuleComponentScanner, ModuleComponentScanner>(ServiceLifetime.Singleton)
+                .Add<IContainer>(this)
                 .GetService<ModuleComponentScanner>()
                 .ComponentScan(assemblies);
 

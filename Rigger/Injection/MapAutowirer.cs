@@ -19,7 +19,7 @@ namespace Rigger.Injection
         public TRType Inject<TRType>(TRType objectToInjectTo)
         {
             // inject into properties
-            objectToInjectTo.GetType().PropertyWithAttribute<AutowireAttribute>().ForEach(property =>
+            objectToInjectTo.GetType().PropertiesWithAttribute<AutowireAttribute>().ForEach(property =>
             {
                 // get an instance of the type that is being autowired.
                 Map.TryGetValue(property.PropertyType, out var instance);

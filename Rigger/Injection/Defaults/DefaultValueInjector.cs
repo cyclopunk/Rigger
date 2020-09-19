@@ -33,7 +33,7 @@ namespace Rigger.Injection.Defaults
         /// <param name="type"></param>
         private void CacheType(Type type)
         {
-            type.PropertyWithAttribute<ValueAttribute>().ForEach(property =>
+            type.PropertiesWithAttribute<ValueAttribute>().ForEach(property =>
             {
                 var accessor = new ExpressionPropertyAccessor(property);
                 PropertyCache.AddOrUpdate(type, new ConcurrentBag<ExpressionPropertyAccessor> { accessor }, (key, value) =>

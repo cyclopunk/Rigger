@@ -25,7 +25,7 @@ namespace Rigger.ManagedTypes.Resolvers
 
             Type t = instance.GetType();
 
-            t.PropertyWithAttribute<ValueAttribute>()
+            t.PropertiesWithAttribute<ValueAttribute>()
                 .ForEach(o =>
                 {
                     try

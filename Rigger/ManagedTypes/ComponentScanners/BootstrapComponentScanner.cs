@@ -33,8 +33,8 @@ namespace Rigger.ManagedTypes.ComponentScanners
                 });
 
             var bootstrapComponents = bootstrapDependencyTree.DepthFirst()
-                .Map(n => n.Type)
-                .FindAll(o => o != null);
+                .Select(n => n.Type)
+                .Where(o => o != null);
 
             bootstrapComponents.ForEach(Handler.HandleComponent);
 

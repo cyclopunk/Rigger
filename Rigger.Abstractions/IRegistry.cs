@@ -8,6 +8,6 @@ namespace Rigger.ManagedTypes
     {
         TRegClass Register(TItem item);
         TRegClass Find(Func<TRegClass, bool> findPredicate);
-        IEnumerable<TRegClass> FindAll(Func<TRegClass, bool> findPredicate);
+        IEnumerable<TRegClass> Where(Func<TRegClass, bool> findPredicate);
     }
 }

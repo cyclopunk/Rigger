@@ -55,7 +55,7 @@ namespace Rigger.Dependencies
         public void Resolve(IDependencyResolver resolver)
         {
             _root.DepthFirst()
-                .Map(o => o.Type)
+                .Select(o => o.Type)
                 .ForEach(resolver.Resolve);
         }
 

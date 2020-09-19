@@ -1,16 +1,53 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 namespace Rigger.Extensions
 {
+    public class AttributeReflections
+    {
+        public Type Attribute { get;  }
+        public Type Type { get;  }
+
+        internal AttributeReflections(Type type, Type attr)
+        {
+            this.Attribute = attr;
+            this.Type = type;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is AttributeReflections rm)
+            {
+                return rm.Type == Type && rm.Attribute == Attribute;
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Attribute, Type);
+        }
+    }
     /// <summary>
     /// Extension methods to help with reflection tasks. At some point I would like to back this
     /// with a reflection cache to make things easier.
     /// </summary>
     public static class ReflectionExtensions
     {
+        private static ConcurrentDictionary<Type, IEnumerable<MethodInfo>> _typeAttributeCache =
+            new ConcurrentDictionary<Type, IEnumerable<MethodInfo>>();
+        private static ConcurrentDictionary<AttributeReflections, IEnumerable<MethodInfo>> _attributeMethodCache =
+            new ConcurrentDictionary<AttributeReflections, IEnumerable<MethodInfo>>();
+        private static ConcurrentDictionary<AttributeReflections, IEnumerable<FieldInfo>> _attributeFieldCache =
+            new ConcurrentDictionary<AttributeReflections, IEnumerable<FieldInfo>>();
+        
+        private static ConcurrentDictionary<AttributeReflections, IEnumerable<PropertyInfo>> _attributePropertyCache =
+            new ConcurrentDictionary<AttributeReflections, IEnumerable<PropertyInfo>>();
+
         // Default Binding Flags 
         public static BindingFlags defaultBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static; 
         /// <summary>
@@ -67,26 +104,48 @@ namespace Rigger.Extensions
 
         public static IEnumerable<MethodInfo> MethodsWithAttribute(this Type type, Type attributeType)
         {
-            try
+            var cached = _attributeMethodCache.GetOrAdd(new AttributeReflections(type,attributeType) , (k) =>
             {
-                return type.GetMethods(defaultBindingFlags)
-                    .Where(m => m.GetCustomAttribute(attributeType) != null);
-            }
-            catch (Exception)
-            {
-                // if any exception happens, just return a blank list.
-                return new List<MethodInfo>();
-            }
+                try
+                {
+                    return type.GetMethods(defaultBindingFlags)
+                        .Where(m => m.GetCustomAttribute(attributeType) != null);
+                }
+                catch (Exception)
+                {
+                    // if any exception happens, just return a blank list.
+                    return new List<MethodInfo>();
+                }
+            });
+
+            return cached;
         }
         public static IEnumerable<MethodInfo> MethodsWithAttribute<TAttribute>(this Type type) where TAttribute:Attribute
         {
-            return type.GetMethods(defaultBindingFlags)
-                .Where(m => m.GetCustomAttribute<TAttribute>() != null);
+            return MethodsWithAttribute(type, typeof(TAttribute));
+        }
+
+        public static IEnumerable<FieldInfo> FieldsWithAttribute(this Type type, Type attributeType)
+        {
+            var cached = _attributeFieldCache.GetOrAdd(new AttributeReflections(type,attributeType) , (k) =>
+            {
+                try
+                {
+                    return type.GetFields(defaultBindingFlags)
+                        .Where(m => m.GetCustomAttribute(attributeType) != null);
+                }
+                catch (Exception)
+                {
+                    // if any exception happens, just return a blank list.
+                    return new List<FieldInfo>();
+                }
+            });
+
+            return cached;
         }
         public static IEnumerable<FieldInfo> FieldsWithAttribute<TAttribute>(this Type type) where TAttribute : Attribute
         {
-            return type.GetFields(defaultBindingFlags)
-                .Where(m => m.GetCustomAttribute<TAttribute>() != null);
+            return FieldsWithAttribute(type, typeof(TAttribute));
         }
         public static IEnumerable<FieldInfo> FieldsNamed(this Type type, string name)
         {
@@ -98,10 +157,27 @@ namespace Rigger.Extensions
             return type.GetMethods(defaultBindingFlags)
                 .Where(m => m.Name == name);
         }
-        public static IEnumerable<PropertyInfo> PropertyWithAttribute<TAttribute>(this Type type) where TAttribute : Attribute
+        public static IEnumerable<PropertyInfo> PropertiesWithAttribute(this Type type, Type attributeType)
         {
-            return type.GetProperties(defaultBindingFlags)
-                .Where(m => m.GetCustomAttribute<TAttribute>() != null);
+            var cached = _attributePropertyCache.GetOrAdd(new AttributeReflections(type,attributeType) , (k) =>
+            {
+                try
+                {
+                    return type.GetProperties(defaultBindingFlags)
+                        .Where(m => m.GetCustomAttribute(attributeType) != null);
+                }
+                catch (Exception)
+                {
+                    // if any exception happens, just return a blank list.
+                    return new List<PropertyInfo>();
+                }
+            });
+
+            return cached;
+        }
+        public static IEnumerable<PropertyInfo> PropertiesWithAttribute<TAttribute>(this Type type) where TAttribute : Attribute
+        {
+            return PropertiesWithAttribute(type, typeof(TAttribute));
         }
         public static IEnumerable<Type> TypesWithAttribute<TAttr>(this Assembly assembly)
         {

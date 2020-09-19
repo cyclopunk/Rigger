@@ -68,11 +68,11 @@ namespace Rigger.ManagedTypes.Implementations
                 _info = _info.MakeGenericMethod(types);
             }
 
-            var invokedTypes = values.Map(o => o.GetType());
+            var invokedTypes = values.Select(o => o.GetType());
 
             var paramsList = _info.GetParameters()
-                .FindAll(mi=> !invokedTypes.Contains(mi.ParameterType)) // don't fill in the parameters from the types passed in values
-                .Map(m =>
+                .Where(mi=> !invokedTypes.Contains(mi.ParameterType)) // don't fill in the parameters from the types passed in values
+                .Select(m =>
                 {
                     try
                     { 
@@ -85,14 +85,14 @@ namespace Rigger.ManagedTypes.Implementations
                     }
                 });
 
-            IEnumerable<object> allParameters = paramsList?.FindAll(o => o != null).Concat(values);
+            IEnumerable<object> allParameters = paramsList?.Where(o => o != null).Concat(values);
 
             return _info.Invoke(dest, allParameters?.ToArray() ?? new object[] {});
         }
 
-        private List<object> ResolveParameters()
+        private IEnumerable<object> ResolveParameters()
         {
-            return _info.GetParameters().Map(m => Services.GetService(m.GetType()));
+            return _info.GetParameters().Select(m => Services.GetService(m.GetType()));
         }
     }
 }

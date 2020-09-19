@@ -83,10 +83,10 @@ namespace Rigger.ManagedTypes.Implementations
            // log?.LogInformation($"ManagedConstructorInvoker: Constructing {_typeToConstruct.Name} parameters: {string.Join(',',parameters)}");
             
        
-            var constructedTypes = parameters.Map(o => o.GetType());
+            var constructedTypes = parameters.Select(o => o.GetType());
 
-            var autowireConstructor = type.GetConstructors()
-                .Find(o => o.GetCustomAttribute<AutowireAttribute>() != null);
+            var autowireConstructor = type
+                .GetConstructors().FirstOrDefault(o => CustomAttributeExtensions.GetCustomAttribute<AutowireAttribute>((MemberInfo) o) != null);
             
             List<ConstructorInfo> constructors = new List<ConstructorInfo>();
 
@@ -114,10 +114,10 @@ namespace Rigger.ManagedTypes.Implementations
 
                 var paramsList = constructor
                     .GetParameters()
-                    .FindAll(mi =>
+                    .Where(mi =>
                         !constructedTypes.Contains(mi
                             .ParameterType)) // don't fill in the parameters from the types passed in values
-                    .Map(m =>
+                    .Select(m =>
                     {
                         ValueAttribute v = m.GetCustomAttribute<ValueAttribute>();
                         // if it's a value, get it from the configuration service, if it's not, use the container to look it up.

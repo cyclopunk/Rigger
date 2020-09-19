@@ -53,31 +53,6 @@ namespace Rigger.Extensions
 
             return itemAtTop;
         }
-
-        /// <summary>
-        /// Add FindAll to arrays
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="items"></param>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public static T[] FindAll<T>(this T[] items, Predicate<T> predicate)
-        {
-            return Array.FindAll(items, predicate);
-        }
-
-        /// <summary>
-        /// Add Find() to arrays.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="items"></param>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public static T Find<T>(this T[] items, Predicate<T> predicate)
-        {
-            return Array.Find(items, predicate);
-        }
-
         /// <summary>
         /// Add a simple method to Get a value from a map or populate the map with the value if that is not found.
         /// </summary>
