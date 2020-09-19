@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Rigger.Configuration;
 
-namespace Rigger.Configuration.Sources
+namespace Drone.Configuration.Sources
 {
     /// <summary>
     /// Simple map based configuration source.

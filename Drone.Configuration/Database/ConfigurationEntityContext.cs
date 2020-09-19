@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Rigger.Configuration
+namespace Drone.Configuration.Database
 {
     /**
      * Default context for configuration values.

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Rigger.Configuration;
+using Rigger.Configuration.Validation;
 using Rigger.Extensions;
 
-namespace Rigger.Configuration.Validation
+namespace Drone.Configuration.Validation
 {
     /**
      * Checks that keys which are passed to the constructor of this validator

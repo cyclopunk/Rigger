@@ -2,8 +2,9 @@
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Rigger.Extensions;
+using IConfigurationSource = Rigger.Configuration.IConfigurationSource;
 
-namespace Rigger.Configuration.Sources
+namespace Drone.Configuration.Sources
 {
     /// <summary>
     /// Configuration source that loads all environment variables into the configuration.

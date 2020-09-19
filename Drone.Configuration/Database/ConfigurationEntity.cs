@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Rigger.Configuration
+namespace Drone.Configuration.Database
 {
     /**
      * Basic entity for storing configuration values.

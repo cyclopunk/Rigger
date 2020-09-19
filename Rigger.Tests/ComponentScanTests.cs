@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Drone.Configuration;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Rigger.Attributes;

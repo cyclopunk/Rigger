@@ -16,13 +16,12 @@ using Rigger.Reflection;
 
 namespace Rigger {
     /// <summary>
-   /// Top level class for an application container. The container will hold all of the
+   /// Top level class for the Rigger application container. The container will hold all of the
    /// managed types and manage their lifetime as well as provide a component scanning
    /// functionality that will allow attributes to be used to manage objects.
    ///
    /// Application containers should be implemented for whatever DI framework is being used for
-   /// the project. A SimpleInjector example is provided with this library as a reference
-   /// implementation.
+   /// the project.
    /// </summary>
     public class Rig : IContainer
    {

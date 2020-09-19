@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Rigger.Configuration;
+using Rigger.Configuration.Validation;
 
-namespace Rigger.Configuration.Validation
+namespace Drone.Configuration.Validation
 {
   
     /// <summary>

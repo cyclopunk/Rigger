@@ -1,10 +1,7 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rigger;
 using Rigger.Attributes;
-using Rigger.Configuration;
-using Rigger.Configuration.Sources;
 using Rigger.Injection;
 using Rigger.ManagedTypes.ComponentHandlers;
 using Rigger.ManagedTypes.ComponentScanners;
@@ -12,7 +9,6 @@ using Rigger.ManagedTypes.Implementations;
 using Rigger.Injection.Defaults;
 using Rigger.Reflection;
 using Rigger.ValueConverters;
-using ServiceLifetime = Rigger.Injection.ServiceLifetime;
 
 namespace Drone.Bootstrap
 {
@@ -43,10 +39,6 @@ namespace Drone.Bootstrap
                 .Add<IValueConverter<string, double>, StringToDoubleConverter>()
                 .Add<IValueConverter<string, long>, StringToLongConverter>()
                 .Add<IValueConverter<string, object>, JsonValueConverter<object>>()
-                .Add<IConfigurationService, DefaultConfigurationService>(ServiceLifetime.Singleton)
-                .Add<IConfigurationSource, EnvironmentConfigurationSource>(ServiceLifetime.Singleton)
-                .Add<IConfigurationSource, AppSettingsConfigurationSource>(ServiceLifetime.Singleton)// default config
-                .Add<IValueInjector, DefaultValueInjector>()
                 .Add(typeof(ILogger<>), typeof(Logger<>)) // logging
                 .Add<IServiceScopeFactory, ServiceScopeFactory>(); // scoped support
 

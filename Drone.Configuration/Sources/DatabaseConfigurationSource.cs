@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Drone.Configuration.Database;
+using Rigger.Configuration;
 using Rigger.Extensions;
 
-namespace Rigger.Configuration.Sources
+namespace Drone.Configuration.Sources
 {
     /// <summary>
     /// Source for a database configuration entity.

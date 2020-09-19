@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Rigger.Configuration;
+using Rigger.Configuration.Validation;
 
-namespace Rigger.Configuration.Validation
+namespace Drone.Configuration.Validation
 {
     /**
      * Validator for a specific key to match a regular expression passed by valueMatcher.

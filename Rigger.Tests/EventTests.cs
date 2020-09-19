@@ -13,6 +13,10 @@ namespace Rigger.Tests
     {
         public bool IsCalled;
     }
+    public class AsyncEvent
+    {
+        public bool IsCalled;
+    }
 
     [Singleton]
     public class EventReceiver
@@ -20,13 +24,14 @@ namespace Rigger.Tests
         public bool IsCalled { get; set; }
 
 
-
+        
+        [OnEvent(typeof(Event))]
         public void CallMe(Event evt)
         {
             IsCalled = evt.IsCalled;
         }
-        [OnEvent(typeof(Event))]
-        public async Task CallMeAsync(Event evt)
+        [OnEvent(typeof(AsyncEvent))]
+        public async Task CallMeAsync(AsyncEvent evt)
         {
             IsCalled = evt.IsCalled;
             await Task.CompletedTask;
@@ -42,7 +47,7 @@ namespace Rigger.Tests
         }
 
         [Fact]
-        public async Task TestEvent()
+        public void TestEvent()
         {
             var rig = new Rig();
 
@@ -59,9 +64,27 @@ namespace Rigger.Tests
             
             reg.Fire(new Event {IsCalled = false});
             e.IsCalled.Should().BeFalse();
+        }
+        
+        [Fact]
+        public async Task TestAsyncEvent()
+        {
+            var rig = new Rig();
+
+            rig
+                .Register<IEventRegistry, EventRegistry>()
+                .Register<EventReceiver, EventReceiver>();
             
-            await reg.FireAsync(new Event {IsCalled = true});
+            var reg = rig.GetService<IEventRegistry>();
+
+            var e = rig.GetService<EventReceiver>();
+
+            await reg.FireAsync(new AsyncEvent {IsCalled = true});
             e.IsCalled.Should().BeTrue();
+
+            await reg.FireAsync(new AsyncEvent {IsCalled = false});
+            e.IsCalled.Should().BeFalse();
+
         }
 
     }

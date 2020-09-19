@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Rigger.Attributes;
+using Rigger.Configuration;
 using Rigger.Configuration.Validation;
 using Rigger.Extensions;
 
-namespace Rigger.Configuration
+namespace Drone.Configuration
 {
 
     /// <summary>

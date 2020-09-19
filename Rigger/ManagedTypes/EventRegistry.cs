@@ -38,30 +38,41 @@ namespace Rigger.ManagedTypes
 
             var methods = instance.GetType().MethodsWithAttribute<OnEventAttribute>();
 
-            var registrations = methods.Select(o =>
+            try
             {
-                _eventRegistry.GetOrPut(instance, () => new List<IEventReceiver>());
-
-                OnEventAttribute attr = o.GetCustomAttribute<OnEventAttribute>();
-                _typeCache.GetOrPut( attr.Event, () => new List<IEventReceiver>());
-
-                ManagedMethodInvoker invoker = new ManagedMethodInvoker(o);
-                invoker.AddServices(Services);
-
-                var registration = new EventReceiver
+                List <IEventReceiver> registrations = new List<IEventReceiver>();
+                foreach (var o in methods)
                 {
-                    Receiver = instance,
-                    EventType = attr.Event,
-                    Invoker = invoker
-                };
+                    {
+                        _eventRegistry.GetOrPut(instance, () => new List<IEventReceiver>());
 
-                _eventRegistry[instance].Add(registration);
-                _typeCache[attr.Event].Add(registration);
+                        OnEventAttribute attr = o.GetCustomAttribute<OnEventAttribute>();
+                        _typeCache.GetOrPut(attr.Event, () => new List<IEventReceiver>());
 
-                return registration;
-            });
+                        ManagedMethodInvoker invoker = new ManagedMethodInvoker(o);
+                        invoker.AddServices(Services);
 
-            return registrations;
+                        var registration = new EventReceiver
+                        {
+                            Receiver = instance,
+                            EventType = attr.Event,
+                            Invoker = invoker
+                        };
+
+                        _eventRegistry[instance].Add(registration);
+                        _typeCache[attr.Event].Add(registration);
+
+
+                    }
+                }
+                
+                return registrations;
+            } catch (Exception e)
+            {
+                Console.WriteLine($"Exception: {e}");
+            }
+
+            return null;
         }
         /// <summary>
         /// Helper method to fire an event to all receivers.
@@ -86,10 +97,16 @@ namespace Rigger.ManagedTypes
         }
         public async Task FireAsync(object eventToFire)
         {
-            var tasks = _typeCache[eventToFire.GetType()].ToList().Where(f => f.EventType == eventToFire.GetType())
-                .Select(o => (Task) o?.Invoker?.Invoke(o.Receiver, eventToFire));
-
-            await Task.WhenAll(tasks);
+            if (!_typeCache.ContainsKey(eventToFire.GetType()))
+            {
+                return;
+            }
+            var events = _typeCache[eventToFire.GetType()].Where(f => f.EventType == eventToFire.GetType()).ToList();
+            foreach(var e in events)
+            {
+                var task = (Task) e.Invoker.Invoke(e.Receiver, eventToFire);
+                task.Wait();
+            }
         }
     }
 }

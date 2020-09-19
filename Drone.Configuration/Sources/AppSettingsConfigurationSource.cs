@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
-using Rigger.Configuration;
 using Rigger.Extensions;
+using IConfigurationSource = Rigger.Configuration.IConfigurationSource;
 
-namespace Rigger.Configuration.Sources
+namespace Drone.Configuration.Sources
 {
     /// <summary>
     /// DotNet Core / ASP.NET AppSettings source for the Rigger Configuration Service.
