@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Rigger.Attributes;
 using Rigger.Extensions;
+using Rigger.ManagedTypes.Implementations;
 using Rigger.Reflection;
 
 namespace Rigger.Injection
@@ -58,6 +59,14 @@ namespace Rigger.Injection
                 Description.ImplementationType
                     .MethodsWithAttribute(typeof(OnCreateAttribute)).ForEach(o =>
                     {
+                        if (o.GetParameters().Any())
+                        {
+                            var invoker = new ManagedMethodInvoker(o).AddServices(Services);
+
+                            invoker.Invoke(instance);
+
+                            return;
+                        }
                         var accessor = new ZeroParameterMethodAccessor(o);
                         
                         Cache.Add(accessor);

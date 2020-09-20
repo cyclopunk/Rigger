@@ -46,7 +46,6 @@ namespace Rigger.Injection
         public IServices Add<TLookupType>(object instance);
         public IServices AddConditionalService(Type serviceType, Type instanceType, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton);
 
-        
         public IEnumerable<ServiceDescription> List(Type type=null);
 
         /// <summary>

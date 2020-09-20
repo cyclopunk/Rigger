@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -32,6 +33,16 @@ namespace Rigger.Reflection
         private Action<object> GenerateVoidMethodAccessor<T>(MethodInfo methodInfo)
         {
             this.info = methodInfo ?? throw new ArgumentNullException(nameof(methodInfo));
+
+            // only way to handle generics it to make them the base type.
+            if (this.info.ContainsGenericParameters)
+            {
+                var args = info.GetGenericArguments();
+                
+                var param = args.Select(a => a.BaseType);
+
+                this.info = info.MakeGenericMethod(param.ToArray());
+            }
             // instance method is called from
             ParameterExpression typeParameter = Expression.Parameter(typeof(object), "method");
 
