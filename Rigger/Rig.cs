@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Rigger.Abstractions;
 using Rigger.Extensions;
 using Rigger.ManagedTypes.ComponentHandlers;
@@ -32,7 +33,7 @@ namespace Rigger {
 
        private bool _disposing = false;
 
-       private ILogger<Rig> logger;
+       private ILogger<Rig> logger = new NullLogger<Rig>();
        private IEventRegistry eventRegistry;
 
        public IServices Services { get; set; }
@@ -93,7 +94,7 @@ namespace Rigger {
        public bool IsBuilt { get; protected set; }
         
        /// <summary>
-       /// This method will return the default assemblies.
+       /// This method will return the default assemblies that are scanned by Rigger.
        /// </summary>
        /// <returns></returns>
        private Assembly[] DefaultAssemblies()
@@ -106,10 +107,8 @@ namespace Rigger {
                .Where(o => o.FullName.Contains(PLUGIN_NAMESPACE)));
 
            autoScannedAssemblies.Add(GetType().Assembly);
-           // ServiceLifetime attributes from Traits
-           autoScannedAssemblies.Add(typeof(ILifecycle).Assembly);
 
-           //logger.LogInformation($"Default assemblies: {string.Join(",",autoScannedAssemblies.Select(o=>o.FullName))}");
+           logger?.LogInformation($"Default assemblies: {string.Join(",",autoScannedAssemblies.Select(o=>o.FullName))}");
 
            return autoScannedAssemblies.Distinct().ToArray();
        }
@@ -182,7 +181,8 @@ namespace Rigger {
             Services = new Services();
 
             Services.Add<IServiceProvider>(this);
-            // bootstrap by adding the module
+
+            // Bootstrap code to get basic module, and a logger.
 
             Services
                 .Add<ModuleComponentScanner, ModuleComponentScanner>(ServiceLifetime.Singleton)
