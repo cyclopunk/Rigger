@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Drone.Bootstrap\Drone.Bootstrap.csproj" />
     <ProjectReference Include="..\Drone.Configuration\Drone.Configuration.csproj" />
+    <ProjectReference Include="..\Drone.Graph\Drone.Graph\Drone.Graph.csproj" />
     <ProjectReference Include="..\Drone.Logging\Drone.Logging.csproj" />
     <ProjectReference Include="..\Rigger\Rigger.csproj" />
   </ItemGroup>

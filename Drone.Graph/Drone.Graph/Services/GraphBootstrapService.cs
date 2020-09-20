@@ -7,6 +7,7 @@ using Drone.Graph.Proxy;
 using EntityGraphQL.Authorization;
 using EntityGraphQL.Schema;
 using Microsoft.EntityFrameworkCore;
+using Rigger.Abstractions;
 using Rigger.API.Attributes;
 using Rigger.Attributes;
 using Rigger.Extensions;
@@ -19,6 +20,7 @@ namespace Drone.Graph.Services
 {
 
         [Bootstrap]
+        [RequiresService(typeof(DbContext))]
         class GraphBootstrapService
         {
             [Autowire] private IContainer container;
@@ -29,7 +31,7 @@ namespace Drone.Graph.Services
             /// </summary>
             /// <typeparam name="TContextType"></typeparam>
             /// <param name="context"></param>
-            [OnCreate]
+            [OnStartup]
             void GraphQLStart<TContextType>(TContextType context)
                 where TContextType : DbContext // will look up the type by DbContext
             {

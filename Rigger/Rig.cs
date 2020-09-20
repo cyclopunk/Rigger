@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Rigger.Abstractions;
 using Rigger.Extensions;
 using Rigger.ManagedTypes.ComponentHandlers;
 using Rigger.Attributes;
@@ -12,6 +13,7 @@ using Rigger.Exceptions;
 using Rigger.Injection;
 using Rigger.ManagedTypes;
 using Rigger.ManagedTypes.ComponentScanners;
+using Rigger.ManagedTypes.Implementations;
 using Rigger.Reflection;
 
 namespace Rigger {
@@ -235,7 +237,46 @@ namespace Rigger {
             }
 
             IsBuilt = true;
-        }
+
+            logger.LogInformation("Calling OnStartup methods");
+
+            Services.List().Where(o =>
+                    o.ImplementationType.HasTypeAttribute(typeof(BootstrapAttribute)))
+                .ForEach(desc =>
+                {
+                    var svc = GetService(desc.ImplementationType);
+
+                    if (desc.ImplementationType.HasTypeAttribute<RequiresServiceAttribute>())
+                    {
+                        var attr = desc.ImplementationType.GetCustomAttribute<RequiresServiceAttribute>();
+
+                        if (!Services.IsManaged(attr.ServiceType))
+                        {
+                            return;
+                        }
+                    }
+
+                    desc.ImplementationType
+                        .MethodsWithAttribute(typeof(OnStartupAttribute)).ForEach(o =>
+                        {
+                            if (o.GetParameters().Any())
+                            {
+                                var invoker = new ManagedMethodInvoker(o).AddServices(Services);
+
+                                invoker.Invoke(svc);
+
+                                return;
+                            }
+
+                            var accessor = new ZeroParameterMethodAccessor(o);
+
+
+                            accessor.Invoke(svc);
+                        });
+                });
+
+            logger.LogInformation("Done Calling OnStartup methods");
+       }
 
        /// <summary>
         /// Method that is called when the application is disposed of. Clears all resources,

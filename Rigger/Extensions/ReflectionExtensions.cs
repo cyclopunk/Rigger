@@ -244,5 +244,9 @@ namespace Rigger.Extensions
         {
             return type.GetCustomAttribute(attr, true) != null;
         }
+        public static bool HasTypeAttribute<TAttribute>(this Type type) where TAttribute : Attribute
+        {
+            return type.GetCustomAttribute(typeof(TAttribute), true) != null;
+        }
     }
 }

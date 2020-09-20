@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Reflection;
+using Rigger.Abstractions;
 using Rigger.ManagedTypes;
 using Rigger.Attributes;
+using Rigger.Extensions;
 using Rigger.Injection;
 
 namespace Rigger.ManagedTypes.ComponentHandlers
@@ -11,6 +14,7 @@ namespace Rigger.ManagedTypes.ComponentHandlers
 
         public void HandleComponent(Type type)
         {
+
             Services.Add(type, type, ServiceLifetime.Singleton);
 
             Services.GetService(type, CallSiteType.Method); // make an instance
